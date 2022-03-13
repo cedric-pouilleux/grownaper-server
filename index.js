@@ -10,8 +10,10 @@ app.options('*', cors());
 /**
  * Init route
  */
-app.get('/', async (req, res) => {
-    const uri = `mongodb://${process.env.MONGO_DATABASE_USERNAME}:${process.env.MONGO_DATABASE_PASSWORD}@${process.env.MONGO_DATABASE_CLUSTER}/${process.env.MONGO_DATABASE}?retryWrites=true&w=majority`;
+app.get('/', async (reqgi, res) => {
+    const uri = `mongodb+srv://${process.env.MONGO_DATABASE_USERNAME}:${process.env.MONGO_DATABASE_PASSWORD}@${process.env.MONGO_DATABASE_CLUSTER}/${process.env.MONGO_DATABASE}?retryWrites=true&w=majority`;
+
+    console.log(uri);
 
     const mongoClient = new MongoClient(uri, {
         useNewUrlParser: true,
