@@ -22,6 +22,7 @@ app.get('/', (req, res) => {
         const collection = client.db(process.env.MONGO_DATABASE).collection("feeders");
         const all = await collection.find({}).toArray();
         await client.close();
+
         res.status(200).json({
             feeders : all
         });
