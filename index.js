@@ -6,6 +6,11 @@ const { MongoClient } = require('mongodb');
 
 const uri = `mongodb+srv://${process.env.MONGO_DATABASE_USERNAME}:${process.env.MONGO_DATABASE_PASSWORD}@${process.env.MONGO_DATABASE_CLUSTER}`;
 
+const client = new MongoClient(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
+
 app.use(cors({credentials: true, origin: true}));
 app.options('*', cors());
 
@@ -13,17 +18,19 @@ app.options('*', cors());
  * Init route
  */
 app.get('/', (req, res) => {
-    const client = new MongoClient(uri, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    });
-    client.connect(async (err) => {
+    client.connect(err => {
         const collection = client.db(process.env.MONGO_DATABASE).collection("feeders");
-        const all = await collection.find({}).toArray();
-        await client.close();
+        collection
+            .find({})
+            .toArray((err, result) => {
+                if(result && !err){
+                    res.status(200).json({
+                        feeders : result
+                    });
+                } else {
 
-        res.status(200).json({
-            feeders : all
+                    res.status(404);
+                }
         });
     });
 });
