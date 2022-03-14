@@ -31,7 +31,7 @@ export default {
      * link?: string
      */
     postAdd: app.post('/add', async (req, res) => {
-        const { title, picture, link } = req.body.title;
+        const { title, picture, link } = req.body;
         await mongoose.connect(MongodbURI);
         Breeders.create({ title, picture, link}, async (err, breeder) => {
             await mongoose.disconnect();
