@@ -6,8 +6,12 @@ const app = express();
 
 app.use(express.json());
 
-export const getAll = app.get('/',
-    async (req, res) => {
+export default {
+
+    /**
+     * Get all breeders
+     */
+    getAll : app.get('/', async (req, res) => {
         await mongoose.connect(MongodbURI);
         const result = await Breeders.find({});
         if(result){
@@ -16,11 +20,15 @@ export const getAll = app.get('/',
             res.status(404);
         }
         await mongoose.disconnect();
-    }
-);
+    }),
 
-export const add = app.post('/add',
-    async (req, res) => {
+    /**
+     * Add new breeder
+     * title: string,
+     * picture?: string,
+     * link?: string
+     */
+    postAdd: app.post('/add', async (req, res) => {
         const { title, picture, link } = req.body.title;
         await mongoose.connect(MongodbURI);
         Breeders.create({ title, picture, link}, async (err, breeder) => {
@@ -31,5 +39,6 @@ export const add = app.post('/add',
             }
             res.status(201).end();
         });
-    }
-);
+    })
+
+};
