@@ -1,10 +1,20 @@
 {
   "name": "grownaper-server",
   "version": "1.0.0",
+  "engines": {
+    "node": "16.14.0",
+    "npm": "7.11.2"
+  },
   "description": "Grownaper server",
-  "main": "index.js",
+  "main": "server/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npm-run-all build server",
+    "watch:dev": "nodemon",
+    "server": "node ./dist-server/index",
+    "transpile": "babel ./server --out-dir dist-server",
+    "clean": "rimraf dist-server",
+    "build": "npm-run-all clean transpile"
   },
   "repository": {
     "type": "git",
@@ -17,9 +27,32 @@
   },
   "homepage": "https://github.com/cedric-pouilleux/grownaper-server#readme",
   "dependencies": {
+    "@babel/cli": "^7.17.6",
+    "@babel/core": "^7.17.7",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/runtime": "^7.17.7",
+    "@babel/plugin-transform-runtime": "^7.17.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
-    "mongodb": "^4.4.1"
+    "mongodb": "^4.4.1",
+    "mongoose": "^6.2.6",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
+  "nodemonConfig": {
+    "exec": "npm run dev",
+    "watch": [
+      "server/*",
+      "public/*"
+    ],
+    "ignore": [
+      "**/__tests__/**",
+      "*.test.js",
+      "*.spec.js"
+    ]
   }
 }
