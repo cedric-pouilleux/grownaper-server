@@ -1,14 +1,11 @@
 import dotenv from 'dotenv';
 import express from 'express';
-import cors from 'cors';
-import { MongoClient } from 'mongodb';
+import mongoose from "mongoose";
+import {Breeders} from "./models";
 
 dotenv.config();
 
-
 const app = express();
-app.use(cors({credentials: true, origin: true}));
-app.options('*', cors());
 
 const { MONGO_DATABASE_USERNAME, MONGO_DATABASE_PASSWORD, MONGO_DATABASE_CLUSTER, MONGO_DATABASE } = process.env;
 const uri = `mongodb+srv://${MONGO_DATABASE_USERNAME}:${MONGO_DATABASE_PASSWORD}@${MONGO_DATABASE_CLUSTER}/${MONGO_DATABASE}?retryWrites=true&w=majority`;
@@ -18,20 +15,16 @@ const uri = `mongodb+srv://${MONGO_DATABASE_USERNAME}:${MONGO_DATABASE_PASSWORD}
  */
 app.route('/breeders')
     .get(async (req, res) => {
-        const mongoClient = new MongoClient(uri);
-        const client = await mongoClient.connect();
-        const collection = client.db(process.env.MONGO_DATABASE).collection("feeders");
-        const all = await collection.find({}).toArray();
-        await mongoClient.close();
-        if(all){
-            res.status(200).json({
-                feeders : all
-            });
+        await mongoose.connect(uri);
+        const result = await Breeders.find({});
+        if(result){
+            res.status(200).json(result);
         } else {
             res.status(404);
         }
+        await mongoose.disconnect();
     });
 
-app.listen(process.env.PORT || 3000, function() {
-    console.log('server running on port 3000', '');
+app.listen(process.env.PORT || 4000, function() {
+    console.log('server running on port 4000', '');
 });
