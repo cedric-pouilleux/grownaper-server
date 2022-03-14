@@ -32,11 +32,12 @@ export default {
      */
     postAdd: app.post('/add', async (req, res) => {
         const { title, picture, link } = req.body;
+        console.log( title, picture, link);
         await mongoose.connect(MongodbURI);
         Breeders.create({ title, picture, link}, async (err, breeder) => {
             await mongoose.disconnect();
             if(err){
-                throw new Error('Error with post breeders')
+                throw new Error(err)
                 res.status(500);
             }
             res.status(201).end();
