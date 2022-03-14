@@ -1,6 +1,10 @@
 {
   "name": "grownaper-server",
   "version": "1.0.0",
+  "engines": {
+    "node": "16.14.0",
+    "npm": "7.11.2"
+  },
   "description": "Grownaper server",
   "main": "server/index.js",
   "scripts": {
