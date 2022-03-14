@@ -7,6 +7,7 @@ dotenv.config();
 
 const app = express();
 app.use(cors({credentials: true, origin: true}));
+
 app.options('*', cors());
 
 const { MONGO_DATABASE_USERNAME, MONGO_DATABASE_PASSWORD, MONGO_DATABASE_CLUSTER, MONGO_DATABASE } = process.env;
