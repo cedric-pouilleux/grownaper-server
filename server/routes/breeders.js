@@ -5,6 +5,8 @@ import {Breeders} from "../models";
 import cors from 'cors';
 const app = express();
 
+import slugify from "slugify";
+
 app.use(cors());
 app.use(express.json());
 
@@ -34,7 +36,7 @@ export default {
         const { title, picture, link } = req.body;
         console.log( title, picture, link);
         await mongoose.connect(MongodbURI);
-        Breeders.create({ title, picture, link}, async (err, breeder) => {
+        Breeders.create({ title, picture, link, slug: slugify(title)}, async (err, breeder) => {
             await mongoose.disconnect();
             if(err){
                 throw new Error(err)
