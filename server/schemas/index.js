@@ -1,4 +1,4 @@
-import { breederSchema } from "./breeder";
+import breederSchema from "./breeder";
 
 export {
     breederSchema

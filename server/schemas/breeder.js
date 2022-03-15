@@ -1,18 +1,26 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 import uniqueValidator from 'mongoose-unique-validator';
+import slugify from 'slugify-mongoose';
 
-export const breederSchema = new Schema({
+const breederSchema = new Schema({
     title: {
         type: String,
-        required: true,
-        unique: true
+        required: [true, 'Breed title is required'],
+        unique: [true, 'This breed title exist'],
+        minLength: [3, 'Breed title is too short'],
     },
     slug: {
         type: String,
+        slug: 'title',
         required: true,
-        unique: true
+        unique: true,
     },
     link: String,
     picture: String,
-}).plugin(uniqueValidator);
+});
+
+breederSchema.plugin(uniqueValidator);
+breederSchema.plugin(slugify);
+
+export default breederSchema;
