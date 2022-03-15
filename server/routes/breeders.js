@@ -40,10 +40,9 @@ export default {
         Breeders.create({ title, picture, link, slug: slugify(title)}, async (err, breeder) => {
             await mongoose.disconnect();
             if(err){
-                console.log(err);
-                res.status(500);
+                return res.status(500).json(err).end();
             }
-            res.status(201).end();
+            res.status(201).json(err).end();
         });
     })
 
