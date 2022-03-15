@@ -37,13 +37,22 @@ export default {
         const { title, picture, link } = req.body;
         console.log( title, picture, link);
         await mongoose.connect(MongodbURI);
-        Breeders.create({ title, picture, link, slug: slugify(title)}, async (err, breeder) => {
-            await mongoose.disconnect();
-            if(err){
-                return res.status(500).json(err).end();
-            }
-            res.status(201).json(err).end();
-        });
+        Breeders.create({
+            title,
+            picture,
+            link,
+            slug: slugify(title)},
+            async (err, breeder) => {
+                await mongoose.disconnect();
+                if(err){
+                    return res.status(422).json({
+                        error : err
+                    });
+                }
+                return res.status(201).json({
+                    message : title + ' successful added'
+                });
+            });
     })
 
 };
