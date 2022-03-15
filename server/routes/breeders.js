@@ -1,11 +1,12 @@
 import express from 'express';
-import mongoose from "mongoose";
-import MongodbURI from "../utils/mongodbURI";
-import {Breeders} from "../models";
+import mongoose from 'mongoose';
+import uniqueValidator from 'mongoose-unique-validator';
+import MongodbURI from '../utils/mongodbURI';
+import {Breeders} from '../models';
+import slugify from 'slugify';
 import cors from 'cors';
-const app = express();
 
-import slugify from "slugify";
+const app = express();
 
 app.use(cors());
 app.use(express.json());
