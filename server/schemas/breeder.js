@@ -7,13 +7,11 @@ const breederSchema = new Schema({
     title: {
         type: String,
         required: [true, 'Breed title is required'],
-        unique: [true, 'This breed title exist'],
         minLength: [3, 'Breed title is too short'],
     },
     slug: {
         type: String,
         slug: 'title',
-        required: true,
         unique: true,
     },
     link: String,

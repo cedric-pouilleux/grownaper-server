@@ -1,9 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import uniqueValidator from 'mongoose-unique-validator';
 import MongodbURI from '../utils/mongodbURI';
 import {Breeders} from '../models';
-import slugify from 'slugify';
 import cors from 'cors';
 
 const app = express();
@@ -29,30 +27,23 @@ export default {
 
     /**
      * Add new breeder
-     * title: string,
-     * picture?: string,
-     * link?: string
      */
     postAdd: app.post('/add', async (req, res) => {
         const { title, picture, link } = req.body;
         console.log( title, picture, link);
         await mongoose.connect(MongodbURI);
-        Breeders.create({
-            title,
-            picture,
-            link,
-            slug: slugify(title)},
-            async (err, breeder) => {
-                await mongoose.disconnect();
-                if(err){
-                    return res.status(422).json({
-                        error : err
-                    });
-                }
-                return res.status(201).json({
-                    message : title + ' successful added'
+        Breeders.create({ title, picture, link }, async (err, breeder) => {
+            await mongoose.disconnect();
+            if(err){
+                return res.status(422).json({
+                    error : err
                 });
+            }
+            return res.status(201).json({
+                message : title + ' successful added',
+                breeder
             });
+        });
     })
 
 };
