@@ -30,7 +30,6 @@ export default {
      */
     postAdd: app.post('/add', async (req, res) => {
         const { title, picture, link } = req.body;
-        console.log( title, picture, link);
         await mongoose.connect(MongodbURI);
         Breeders.create({ title, picture, link }, async (err, breeder) => {
             await mongoose.disconnect();
@@ -43,6 +42,21 @@ export default {
                 message : title + ' successful added',
                 breeder
             });
+        });
+    }),
+
+    /**
+     * Remove breeder by id
+     */
+    delete: app.delete('/delete/:id', async (req, res) => {
+        const id = req.params.id;
+        await mongoose.connect(MongodbURI);
+        Breeders.deleteOne({ id: id }, async (err, res) => {
+            await mongoose.disconnect();
+            if(err){
+                return res.status(422).end();
+            }
+            return res.status(201).end();
         });
     })
 
