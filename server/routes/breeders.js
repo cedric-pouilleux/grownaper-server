@@ -51,12 +51,16 @@ export default {
     delete: app.delete('/delete/:id', async (req, res) => {
         const id = req.params.id;
         await mongoose.connect(MongodbURI);
-        Breeders.deleteOne(id, async (err, res) => {
+        Breeders.deleteOne(id, async (err, breeder) => {
             await mongoose.disconnect();
             if(err){
+                console.log(err);
                 return res.status(422).end();
             }
-            return res.status(201).end();
+            return res.status(201).json({
+                message: id + 'Has beed delete',
+                breeder
+            });
         });
     })
 
