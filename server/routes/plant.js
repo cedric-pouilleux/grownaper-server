@@ -10,9 +10,8 @@ export default {
     /**
      * Get all plant
      */
-    getAll : app.get('/', async (req, res) => {
-        await Plant.find({})
-            .populate('Variety')
+    getAll : app.get('/', (req, res) => {
+       Plant.find({})
             .populate('Breeder')
             .exec(function (err, result) {
                 if (err) {
