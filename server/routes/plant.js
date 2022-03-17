@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import "../utils/database";
 import { Plant } from '../models';
 
@@ -23,7 +24,9 @@ export default {
      */
     postAdd: app.post('/add', async (req, res) => {
         const { createdAt, breeder, variety } = req.body;
-        Plant.create({ createdAt, breeder, variety }, async (err, variety) => {
+        const _id = new mongoose.Types.ObjectId();
+        const qrcode = 'https://elegant-brahmagupta-4cd12e.netlify.app/plant/' + _id;
+        Plant.create({ _id, createdAt, breeder, variety, qrcode }, async (err, variety) => {
             if(err){
                 return res.status(422).json({
                     error : err
