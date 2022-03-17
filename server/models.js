@@ -6,9 +6,9 @@ import {
     varietySchema
 } from "./schemas";
 
-const Breeders = mongoose.model('Breeder', breederSchema);
-const Plant = mongoose.model('Plant', plantSchema);
-const Variety = mongoose.model('Variety', varietySchema);
+const Breeders = mongoose.model('Breeder', breederSchema, 'breeders');
+const Plant = mongoose.model('Plant', plantSchema, 'plants');
+const Variety = mongoose.model('Variety', varietySchema, 'varieties');
 
 export {
     Breeders,
