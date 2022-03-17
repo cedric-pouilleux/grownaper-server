@@ -13,7 +13,7 @@ export default {
     getAll : app.get('/', async (req, res) => {
         await mongoose.connect(MongodbURI);
         const result = await Variety.find({});
-        await mongoose.disconnect();
+        await mongoose.connection.close();
         if(result){
             res.status(200).json(result);
         } else {
@@ -28,7 +28,7 @@ export default {
         await mongoose.connect(MongodbURI);
         const title = req.body.title;
         Variety.create({ title: title }, async (err, variety) => {
-            await mongoose.disconnect();
+            await mongoose.connection.close();
             if(err){
                 return res.status(422).json({
                     error : err
@@ -48,7 +48,7 @@ export default {
         const id = req.params.id;
         await mongoose.connect(MongodbURI);
         Variety.deleteOne({ '_id': id }, async (err) => {
-            await mongoose.disconnect();
+            await mongoose.connection.close();
             if(err){
                 console.log(err);
                 return res.status(422).end();

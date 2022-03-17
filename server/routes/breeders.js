@@ -13,7 +13,7 @@ export default {
     getAll : app.get('/', async (req, res) => {
         await mongoose.connect(MongodbURI);
         const result = await Breeders.find({});
-        await mongoose.disconnect();
+        await mongoose.connection.close();
         if(result){
             res.status(200).json(result);
         } else {
@@ -28,7 +28,7 @@ export default {
         const { title, picture, link } = req.body;
         await mongoose.connect(MongodbURI);
         Breeders.create({ title, picture, link }, async (err, breeder) => {
-            await mongoose.disconnect();
+            await mongoose.connection.close();
             if(err){
                 return res.status(422).json({
                     error : err
@@ -48,7 +48,7 @@ export default {
         const id = req.params.id;
         await mongoose.connect(MongodbURI);
         Breeders.deleteOne({ '_id': id }, async (err, breeder) => {
-            await mongoose.disconnect();
+            await mongoose.connection.close();
             if(err){
                 console.log(err);
                 return res.status(422).end();
