@@ -11,12 +11,16 @@ export default {
      * Get all plant
      */
     getAll : app.get('/', async (req, res) => {
-        const result = await Plant.find({});
-        if(result){
-            res.status(200).json(result);
-        } else {
-            res.status(404).end();
-        }
+        await Plant.find({})
+            .populate('Variety')
+            .populate('Breeder')
+            .exec(function (err, result) {
+                if (err) {
+                    console.log(err);
+                    res.status(404).end();
+                }
+                res.status(200).json(result);
+            });
     }),
 
     /**
@@ -25,6 +29,7 @@ export default {
     postAdd: app.post('/add', async (req, res) => {
         const { createdAt, breeder, variety } = req.body;
         const _id = new mongoose.Types.ObjectId();
+        //TODO use baseurl
         const qrcode = 'https://elegant-brahmagupta-4cd12e.netlify.app/plant/' + _id;
         Plant.create({ _id, createdAt, breeder, variety, qrcode }, async (err, variety) => {
             if(err){
