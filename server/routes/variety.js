@@ -23,7 +23,6 @@ export default {
      */
     postAdd: app.post('/add', async (req, res) => {
         const title = req.body.title;
-        console.log(title);
         Variety.create({ title: title }, async (err, variety) => {
             if(err){
                 console.log(err);
@@ -45,7 +44,6 @@ export default {
         const id = req.params.id;
         Variety.deleteOne({ '_id': id }, async (err) => {
             if(err){
-                console.log(err);
                 return res.status(422).end();
             }
             return res.status(201).json({

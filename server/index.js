@@ -18,6 +18,7 @@ app.use('/variety', varietyRoutes.delete);
 app.use('/plants', plantRoutes.getAll);
 app.use('/plant', plantRoutes.postAdd);
 app.use('/plant', plantRoutes.delete);
+app.use('/plant', plantRoutes.edit);
 
 app.listen(process.env.PORT || 3000, function() {
     console.log('server running on port 3000', '');
