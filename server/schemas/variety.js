@@ -6,7 +6,6 @@ const varietySchema = new Schema({
     title: {
         type: String,
         required: true,
-        unique: true,
     },
     slug: {
         type: String,
@@ -14,5 +13,7 @@ const varietySchema = new Schema({
         unique: true
     },
 });
+
 varietySchema.plugin(slugify);
+
 export default varietySchema;
