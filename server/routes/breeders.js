@@ -13,12 +13,12 @@ export default {
     getAll : app.get('/', async (req, res) => {
         await mongoose.connect(MongodbURI);
         const result = await Breeders.find({});
+        await mongoose.disconnect();
         if(result){
             res.status(200).json(result);
         } else {
-            res.status(404);
+            res.status(404).end();
         }
-        await mongoose.disconnect();
     }),
 
     /**
