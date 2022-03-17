@@ -49,20 +49,23 @@ export default {
      */
     edit: app.put('/edit', async (req, res) => {
         const { id, breeder, variety } = req.body;
+        console.log(breeder, variety);
         try {
-            const plant = await Plant.findOne({_id: id});
-            plant.variety = variety;
-            plant.breeder = breeder;
-            await plant.save();
+            const plant = await Plant.findOneAndUpdate(
+                { _id: id },
+                { variety, breeder},
+                { new: true }
+            );
+            console.log(plant);
+            return res.status(201).json({
+                message : id + ' successful added'
+            });
         } catch(err) {
             console.log(err);
             return res.status(422).json({
                 error : err
             });
         }
-        return res.status(201).json({
-            message : id + ' successful added'
-        });
     }),
 
     /**
