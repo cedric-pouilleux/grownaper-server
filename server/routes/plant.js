@@ -30,7 +30,7 @@ export default {
                 });
             }
             return res.status(201).json({
-                message : name + ' successful added',
+                message : variety + ' successful added',
                 variety
             });
         });
