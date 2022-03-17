@@ -1,7 +1,11 @@
 import express from 'express';
 import { breederRoutes/*, varietyRoutes, plantRoutes */} from "./routes";
+import cors from "cors";
 
 const app = express();
+
+app.use(cors());
+app.use(express.json());
 
 app.use('/breeders', breederRoutes.getAll);
 app.use('/breeders', breederRoutes.postAdd);
