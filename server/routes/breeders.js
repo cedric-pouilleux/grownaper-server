@@ -2,8 +2,12 @@ import express from 'express';
 import mongoose from 'mongoose';
 import MongodbURI from '../utils/mongodbURI';
 import { Breeders } from '../models';
+import cors from "cors";
 
 const app = express();
+
+app.use(cors());
+app.use(express.json());
 
 export default {
 

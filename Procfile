@@ -1,1 +1,1 @@
-web: node dist-server/models.js
+web: node ./dist-server/index
