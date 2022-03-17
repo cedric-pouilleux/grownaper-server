@@ -1,18 +1,18 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import MongodbURI from '../utils/mongodbURI';
-import { Breeders } from '../models';
+import { Plant } from '../models';
 
 const app = express();
 
 export default {
 
     /**
-     * Get all breeders
+     * Get all plant
      */
     getAll : app.get('/', async (req, res) => {
         await mongoose.connect(MongodbURI);
-        const result = await Breeders.find({});
+        const result = await Plant.find({});
         if(result){
             res.status(200).json(result);
         } else {
@@ -22,12 +22,12 @@ export default {
     }),
 
     /**
-     * Add new breeder
+     * Add new plant
      */
     postAdd: app.post('/add', async (req, res) => {
-        const { title, picture, link } = req.body;
         await mongoose.connect(MongodbURI);
-        Breeders.create({ title, picture, link }, async (err, breeder) => {
+        const { createdAt, breeder, variety } = req.body;
+        Plant.create({ createdAt, breeder, variety }, async (err, variety) => {
             await mongoose.disconnect();
             if(err){
                 return res.status(422).json({
@@ -35,27 +35,26 @@ export default {
                 });
             }
             return res.status(201).json({
-                message : title + ' successful added',
-                breeder
+                message : name + ' successful added',
+                variety
             });
         });
     }),
 
     /**
-     * Remove breeder by id
+     * Remove plant by id
      */
     delete: app.delete('/delete/:id', async (req, res) => {
         const id = req.params.id;
         await mongoose.connect(MongodbURI);
-        Breeders.deleteOne({ '_id': id }, async (err, breeder) => {
+        Plant.deleteOne({ '_id': id }, async (err) => {
             await mongoose.disconnect();
             if(err){
                 console.log(err);
                 return res.status(422).end();
             }
             return res.status(201).json({
-                message: id + 'Has beed delete',
-                breeder
+                message: id + 'Has beed delete'
             });
         });
     })

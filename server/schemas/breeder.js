@@ -15,6 +15,7 @@ const breederSchema = new Schema({
     },
     link: String,
     picture: String,
+    varieties: [{  type: Schema.Types.ObjectId, ref: 'Variety'}]
 });
 
 export default breederSchema;
