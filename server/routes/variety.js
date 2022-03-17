@@ -26,8 +26,8 @@ export default {
      */
     postAdd: app.post('/add', async (req, res) => {
         await mongoose.connect(MongodbURI);
-        const name = req.body.name;
-        Variety.create({ name: name }, async (err, variety) => {
+        const title = req.body.title;
+        Variety.create({ title: title }, async (err, variety) => {
             await mongoose.disconnect();
             if(err){
                 return res.status(422).json({
@@ -35,7 +35,7 @@ export default {
                 });
             }
             return res.status(201).json({
-                message : name + ' successful added',
+                message : title + ' successful added',
                 variety
             });
         });

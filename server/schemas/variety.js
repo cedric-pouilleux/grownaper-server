@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const varietySchema = new Schema({
-    name: {
+    title: {
         type: String,
         required: true,
     },
