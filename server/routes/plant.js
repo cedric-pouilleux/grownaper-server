@@ -12,7 +12,8 @@ export default {
      */
     getAll : app.get('/', (req, res) => {
        Plant.find({})
-            .populate('Breeder')
+            .populate('breeder')
+            .populate('variety')
             .exec(function (err, result) {
                 if (err) {
                     console.log(err);

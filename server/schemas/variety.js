@@ -12,6 +12,7 @@ const varietySchema = new Schema({
         slug: 'title',
         unique: true
     },
+    breeders: [{  type: Schema.Types.ObjectId, ref: 'Breeder'}]
 });
 
 varietySchema.plugin(slugify);
