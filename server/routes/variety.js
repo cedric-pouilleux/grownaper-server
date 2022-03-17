@@ -1,54 +1,55 @@
 import express from 'express';
 import "../utils/database";
-import { Breeders } from '../models';
+import { Variety } from '../models';
 
 const app = express();
 
 export default {
 
     /**
-     * Get all breeders
+     * Get all varieties
      */
     getAll : app.get('/', async (req, res) => {
-        const result = await Breeders.find({});
+        const result = await Variety.find({});
         if(result){
             res.status(200).json(result);
         } else {
-            res.status(404).end();
+            res.status(404);
         }
     }),
 
     /**
-     * Add new breeder
+     * Add new variety
      */
     postAdd: app.post('/add', async (req, res) => {
-        const { title, picture, link } = req.body;
-        Breeders.create({ title, picture, link }, async (err, breeder) => {
+        const title = req.body.title;
+        console.log(title);
+        Variety.create({ title: title }, async (err, variety) => {
             if(err){
+                console.log(err);
                 return res.status(422).json({
                     error : err
                 });
             }
             return res.status(201).json({
                 message : title + ' successful added',
-                breeder
+                variety
             });
         });
     }),
 
     /**
-     * Remove breeder by id
+     * Remove variety by id
      */
     delete: app.delete('/delete/:id', async (req, res) => {
         const id = req.params.id;
-        Breeders.deleteOne({ '_id': id }, async (err, breeder) => {
+        Variety.deleteOne({ '_id': id }, async (err) => {
             if(err){
                 console.log(err);
                 return res.status(422).end();
             }
             return res.status(201).json({
-                message: id + 'Has beed delete',
-                breeder
+                message: id + 'Has beed delete'
             });
         });
     })
