@@ -1,6 +1,5 @@
 import express from 'express';
-import mongoose from 'mongoose';
-import MongodbURI from '../utils/mongodbURI';
+import "../utils/database";
 import { Breeders } from '../models';
 
 const app = express();
@@ -11,9 +10,7 @@ export default {
      * Get all breeders
      */
     getAll : app.get('/', async (req, res) => {
-        await mongoose.connect(MongodbURI);
         const result = await Breeders.find({});
-        await mongoose.connection.close();
         if(result){
             res.status(200).json(result);
         } else {
@@ -26,9 +23,7 @@ export default {
      */
     postAdd: app.post('/add', async (req, res) => {
         const { title, picture, link } = req.body;
-        await mongoose.connect(MongodbURI);
         Breeders.create({ title, picture, link }, async (err, breeder) => {
-            await mongoose.connection.close();
             if(err){
                 return res.status(422).json({
                     error : err
@@ -46,9 +41,7 @@ export default {
      */
     delete: app.delete('/delete/:id', async (req, res) => {
         const id = req.params.id;
-        await mongoose.connect(MongodbURI);
         Breeders.deleteOne({ '_id': id }, async (err, breeder) => {
-            await mongoose.connection.close();
             if(err){
                 console.log(err);
                 return res.status(422).end();

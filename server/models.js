@@ -1,5 +1,10 @@
 import mongoose from "mongoose";
-import {breederSchema, plantSchema, varietySchema} from "./schemas";
+import "./utils/database";
+import {
+    breederSchema,
+    plantSchema,
+    varietySchema
+} from "./schemas";
 
 const Breeders = mongoose.model('Breeder', breederSchema);
 const Plant = mongoose.model('Plant', plantSchema);
