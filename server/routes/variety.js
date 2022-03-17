@@ -23,8 +23,10 @@ export default {
      */
     postAdd: app.post('/add', async (req, res) => {
         const title = req.body.title;
+        console.log(title);
         Variety.create({ title: title }, async (err, variety) => {
             if(err){
+                console.log(err);
                 return res.status(422).json({
                     error : err
                 });
