@@ -1,6 +1,6 @@
 import express from 'express';
 import "../utils/database";
-import { Variety } from '../models';
+import {Breeders, Variety} from '../models';
 
 const app = express();
 
@@ -35,6 +35,28 @@ export default {
                 variety
             });
         });
+    }),
+
+    /**
+     * Edit variety
+     */
+    edit: app.post('/edit', async (req, res) => {
+        const { id, title } = req.body;
+        try {
+            await Variety.findOneAndUpdate(
+                { _id: id },
+                { title },
+                { new: true }
+            );
+            return res.status(201).json({
+                message : id + ' successful added'
+            });
+        } catch(err) {
+            console.log(err);
+            return res.status(422).json({
+                error : err
+            });
+        }
     }),
 
     /**

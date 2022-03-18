@@ -10,10 +10,12 @@ app.use(express.json());
 app.use('/breeders', breederRoutes.getAll);
 app.use('/breeders', breederRoutes.postAdd);
 app.use('/breeders', breederRoutes.delete);
+app.use('/breeders', breederRoutes.edit);
 
 app.use('/varieties', varietyRoutes.getAll);
 app.use('/variety', varietyRoutes.postAdd);
 app.use('/variety', varietyRoutes.delete);
+app.use('/variety', varietyRoutes.edit);
 
 app.use('/plants', plantRoutes.getAll);
 app.use('/plant', plantRoutes.postAdd);

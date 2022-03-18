@@ -39,7 +39,7 @@ export default {
     /**
      * Edit breeder
      */
-    edit: app.post('/edit', async (req, res) => {
+    edit: app.put('/edit', async (req, res) => {
         const { id, title, picture, link, country } = req.body;
         try {
             await Breeders.findOneAndUpdate(
