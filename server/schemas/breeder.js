@@ -13,8 +13,21 @@ const breederSchema = new Schema({
         slug: 'title',
         unique: true
     },
-    link: String,
-    picture: String,
+    country: {
+        type: String,
+        required: false,
+        minLength: 1
+    },
+    link: {
+        type: String,
+        required: false,
+        minLength: 6,
+        //add pattern for http validation
+    },
+    picture: {
+        type: String,
+        required: false
+    },
     varieties: [{  type: Schema.Types.ObjectId, ref: 'Variety'}]
 });
 

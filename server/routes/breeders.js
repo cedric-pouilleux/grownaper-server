@@ -22,8 +22,8 @@ export default {
      * Add new breeder
      */
     postAdd: app.post('/add', async (req, res) => {
-        const { title, picture, link } = req.body;
-        Breeders.create({ title, picture, link }, async (err, breeder) => {
+        const { title, picture, link, country } = req.body;
+        Breeders.create({ title, picture, link, country }, async (err, breeder) => {
             if(err){
                 return res.status(422).json({
                     error : err
