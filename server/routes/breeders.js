@@ -1,6 +1,6 @@
 import express from 'express';
 import "../utils/database";
-import { Breeders } from '../models';
+import {Breeders, Plant} from '../models';
 
 const app = express();
 
@@ -34,6 +34,28 @@ export default {
                 breeder
             });
         });
+    }),
+
+    /**
+     * Edit breeder
+     */
+    edit: app.post('/edit', async (req, res) => {
+        const { id, title, picture, link, country } = req.body;
+        try {
+            await Breeders.findOneAndUpdate(
+                { _id: id },
+                { title, picture, link, country },
+                { new: true }
+            );
+            return res.status(201).json({
+                message : id + ' successful added'
+            });
+        } catch(err) {
+            console.log(err);
+            return res.status(422).json({
+                error : err
+            });
+        }
     }),
 
     /**

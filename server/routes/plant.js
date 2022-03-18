@@ -49,14 +49,12 @@ export default {
      */
     edit: app.put('/edit', async (req, res) => {
         const { id, breeder, variety, createdAt } = req.body;
-        console.log(breeder, variety);
         try {
-            const plant = await Plant.findOneAndUpdate(
+            await Plant.findOneAndUpdate(
                 { _id: id },
                 { variety, breeder, createdAt: new Date(createdAt)},
                 { new: true }
             );
-            console.log(plant);
             return res.status(201).json({
                 message : id + ' successful added'
             });
