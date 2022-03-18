@@ -1,6 +1,6 @@
 import express from 'express';
 import "../utils/database";
-import { Variety } from '../models';
+import {Breeders, Variety} from '../models';
 
 const app = express();
 
@@ -23,7 +23,6 @@ export default {
      */
     postAdd: app.post('/add', async (req, res) => {
         const title = req.body.title;
-        console.log(title);
         Variety.create({ title: title }, async (err, variety) => {
             if(err){
                 console.log(err);
@@ -39,13 +38,34 @@ export default {
     }),
 
     /**
+     * Edit variety
+     */
+    edit: app.put('/edit', async (req, res) => {
+        const { _id, title } = req.body;
+        try {
+            await Variety.findOneAndUpdate(
+                { _id },
+                { title },
+                { new: true }
+            );
+            return res.status(201).json({
+                message : _id + ' successful added'
+            });
+        } catch(err) {
+            console.log(err);
+            return res.status(422).json({
+                error : err
+            });
+        }
+    }),
+
+    /**
      * Remove variety by id
      */
     delete: app.delete('/delete/:id', async (req, res) => {
         const id = req.params.id;
         Variety.deleteOne({ '_id': id }, async (err) => {
             if(err){
-                console.log(err);
                 return res.status(422).end();
             }
             return res.status(201).json({
