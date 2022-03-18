@@ -7,10 +7,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use('/breeders', breederRoutes.getAll);
-app.use('/breeders', breederRoutes.postAdd);
-app.use('/breeders', breederRoutes.delete);
-app.use('/breeders', breederRoutes.edit);
+app.use('/breeders', breederRoutes.all);
+app.use('/breeder', breederRoutes.add);
+app.use('/breeder', breederRoutes.delete);
+app.use('/breeder', breederRoutes.edit);
 
 app.use('/varieties', varietyRoutes.getAll);
 app.use('/variety', varietyRoutes.postAdd);

@@ -9,7 +9,7 @@ export default {
     /**
      * Get all breeders
      */
-    getAll : app.get('/', async (req, res) => {
+    all : app.get('/', async (req, res) => {
         const result = await Breeders.find({});
         if(result){
             res.status(200).json(result);
@@ -21,7 +21,7 @@ export default {
     /**
      * Add new breeder
      */
-    postAdd: app.post('/add', async (req, res) => {
+    add: app.post('/add', async (req, res) => {
         const { title, picture, link, country } = req.body;
         Breeders.create({ title, picture, link, country }, async (err, breeder) => {
             if(err){
@@ -40,15 +40,15 @@ export default {
      * Edit breeder
      */
     edit: app.put('/edit', async (req, res) => {
-        const { id, title, picture, link, country } = req.body;
+        const { _id, title, picture, link, country } = req.body;
         try {
             await Breeders.findOneAndUpdate(
-                { _id: id },
+                { _id },
                 { title, picture, link, country },
                 { new: true }
             );
             return res.status(201).json({
-                message : id + ' successful added'
+                message : _id + ' successful added'
             });
         } catch(err) {
             console.log(err);
