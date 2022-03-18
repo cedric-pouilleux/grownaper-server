@@ -48,12 +48,12 @@ export default {
      * Edit plant
      */
     edit: app.put('/edit', async (req, res) => {
-        const { id, breeder, variety } = req.body;
+        const { id, breeder, variety, createdAt } = req.body;
         console.log(breeder, variety);
         try {
             const plant = await Plant.findOneAndUpdate(
                 { _id: id },
-                { variety, breeder},
+                { variety, breeder, createdAt: new Date(createdAt)},
                 { new: true }
             );
             console.log(plant);
