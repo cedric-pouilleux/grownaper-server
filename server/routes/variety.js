@@ -40,16 +40,16 @@ export default {
     /**
      * Edit variety
      */
-    edit: app.post('/edit', async (req, res) => {
-        const { id, title } = req.body;
+    edit: app.put('/edit', async (req, res) => {
+        const { _id, title } = req.body;
         try {
             await Variety.findOneAndUpdate(
-                { _id: id },
+                { _id },
                 { title },
                 { new: true }
             );
             return res.status(201).json({
-                message : id + ' successful added'
+                message : _id + ' successful added'
             });
         } catch(err) {
             console.log(err);
