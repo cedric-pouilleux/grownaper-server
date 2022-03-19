@@ -1,12 +1,19 @@
-import express from 'express';
+import express from "express";
 import { breederRoutes, varietyRoutes, plantRoutes } from "./routes";
 import cors from "cors";
 
+const bodyParser = require('body-parser')
 const app = express();
 
 app.use(cors());
-app.use(express.json());
 
+app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+/**
+ * TODO Modularize routing
+ */
 app.use('/breeders', breederRoutes.all);
 app.use('/breeder', breederRoutes.add);
 app.use('/breeder', breederRoutes.delete);
