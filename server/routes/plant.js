@@ -28,11 +28,11 @@ export default {
      */
     postAdd: app.post('/add', async (req, res) => {
         const _id = new mongoose.mongo.ObjectId();
+        console.log(req.body);
         try {
             await Plant.create({
-                _id,
                 ...req.body,
-                qrcode : 'https://elegant-brahmagupta-4cd12e.netlify.app/plant/' + _id
+                qrcode : 'https://elegant-brahmagupta-4cd12e.netlify.app/plant/'
             });
             return res.status(201).json({
                 message : _id + ' successful added',
@@ -48,6 +48,7 @@ export default {
      */
     edit: app.put('/edit', async (req, res) => {
         const _id = req.body._id;
+        console.log(req.body);
         try {
             await Plant.findOneAndUpdate({ _id }, req.body);
             return res.status(201).json({
