@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const plantSchema = new Schema({
+    _id: {
+        type: Schema.Types.ObjectId,
+        unique: true
+    },
     createdAt: Date,
     qrcode: String,
     name: {
