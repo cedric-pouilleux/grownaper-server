@@ -2,9 +2,10 @@ import express from 'express';
 import "../utils/database";
 import {Variety} from '../models';
 import slugify from "slugify";
-import breeder from "../schemas/breeder";
 
 const app = express();
+
+const slugifyVariety = (title, fem, auto) => slugify(`${title} ${fem && 'feminized'} ${auto && 'automatic'}`)
 
 export default {
 
@@ -31,7 +32,7 @@ export default {
             title,
             feminized,
             automatic,
-            slugify: slugify(`${title} ${breeder} ${feminized && 'feminized'} ${automatic && 'automatic'}`)
+            slug: slugifyVariety(title, feminized, automatic)
         }
 
         try {
@@ -55,7 +56,7 @@ export default {
             title,
             feminized,
             automatic,
-            slugify: slugify(`${title} ${breeder} ${feminized && 'feminized'} ${automatic && 'automatic'}`)
+            slug: slugifyVariety(title, feminized, automatic)
         }
         try {
             await Variety.findOneAndUpdate({ _id }, params);

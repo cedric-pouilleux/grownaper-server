@@ -22,10 +22,4 @@ const varietySchema = new Schema({
     breeders: [{  type: Schema.Types.ObjectId, ref: 'Breeder'}]
 });
 
-varietySchema.index({
-    title: 1,
-    feminized: 1,
-    automatic: 1
-}, { unique: true });
-
 export default varietySchema;
