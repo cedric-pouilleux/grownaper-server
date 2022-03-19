@@ -27,7 +27,7 @@ export default {
      * Add new plant
      */
     postAdd: app.post('/add', async (req, res) => {
-        const _id = new mongoose.Types.ObjectId();
+        const _id = new mongoose.mongo.ObjectId();
         try {
             await Plant.create({
                 _id,
