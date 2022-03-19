@@ -27,15 +27,13 @@ export default {
      * Add new plant
      */
     postAdd: app.post('/add', async (req, res) => {
-        const _id = new mongoose.Types.ObjectId();
         try {
             await Plant.create({
-                _id,
                 ...req.body,
                 qrcode : 'https://elegant-brahmagupta-4cd12e.netlify.app/plant/' + _id
             });
             return res.status(201).json({
-                message : _id + ' successful added',
+                message : 'successful added',
             });
         } catch(err) {
             console.error(err);
