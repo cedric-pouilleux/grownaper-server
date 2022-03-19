@@ -4,7 +4,10 @@ const { Schema } = mongoose;
 const plantSchema = new Schema({
     _id: {
         type: Schema.Types.ObjectId,
-        unique: true
+        unique: true,
+        index: true,
+        required: true,
+        auto: true,
     },
     createdAt: Date,
     qrcode: String,
