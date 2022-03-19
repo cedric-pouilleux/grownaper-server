@@ -49,7 +49,7 @@ export default {
     edit: app.put('/edit', async (req, res) => {
         const _id = req.body._id;
         try {
-            await Plant.findOneAndUpdate({ _id }, req.body, { new: true });
+            await Plant.findOneAndUpdate({ _id }, req.body);
             return res.status(201).json({
                 message : _id + ' successful added'
             });
