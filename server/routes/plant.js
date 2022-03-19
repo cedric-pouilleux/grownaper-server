@@ -28,12 +28,16 @@ export default {
      */
     postAdd: app.post('/add', async (req, res) => {
         const _id = new mongoose.mongo.ObjectId();
-        console.log(req.body);
+        const obj = {
+            _id,
+            name: req.body.name,
+            createdAt: req.body.createdAt,
+            qrcode: 'https://elegant-brahmagupta-4cd12e.netlify.app/plant/' + _id,
+            breeder: req.body.breeder,
+            variety: req.body.variety,
+        }
         try {
-            await Plant.create({
-                ...req.body,
-                qrcode : 'https://elegant-brahmagupta-4cd12e.netlify.app/plant/'
-            });
+            await Plant.create(obj);
             return res.status(201).json({
                 message : _id + ' successful added',
             });
@@ -48,14 +52,19 @@ export default {
      */
     edit: app.put('/edit', async (req, res) => {
         const _id = req.body._id;
-        console.log(req.body);
+        const params =  {
+            name: req.body.name,
+            createdAt: req.body.createdAt,
+            breeder: req.body.breeder,
+            variety: req.body.variety,
+        }
         try {
-            await Plant.findOneAndUpdate({ _id }, req.body);
+            await Plant.findOneAndUpdate({ _id }, params);
             return res.status(201).json({
                 message : _id + ' successful added'
             });
         } catch(err) {
-            console.log(err);
+            console.error(err);
             return res.status(422).json({
                 error : err
             });
