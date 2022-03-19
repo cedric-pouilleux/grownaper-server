@@ -1,6 +1,8 @@
 import express from 'express';
 import "../utils/database";
-import {Breeders, Variety} from '../models';
+import {Variety} from '../models';
+import slugify from "slugify";
+import breeder from "../schemas/breeder";
 
 const app = express();
 
@@ -23,39 +25,44 @@ export default {
      */
     postAdd: app.post('/add', async (req, res) => {
         const title = req.body.title;
-        Variety.create({ title: title }, async (err, variety) => {
-            if(err){
-                console.log(err);
-                return res.status(422).json({
-                    error : err
-                });
-            }
-            return res.status(201).json({
-                message : title + ' successful added',
-                variety
-            });
-        });
+        const feminized = req.body.feminized;
+        const automatic = req.body.automatic;
+        const obj = {
+            title,
+            feminized,
+            automatic,
+            slugify: slugify(`${title} ${breeder} ${feminized && 'feminized'} ${automatic && 'automatic'}`)
+        }
+
+        try {
+            await Variety.create(obj);
+            return res.status(201).json();
+        } catch(err) {
+            console.log(err);
+            return res.status(422).send('Error with server [422]');
+        }
     }),
 
     /**
      * Edit variety
      */
     edit: app.put('/edit', async (req, res) => {
-        const { _id, title } = req.body;
+        const _id = req.body._id;
+        const title = req.body.title;
+        const feminized = req.body.feminized;
+        const automatic = req.body.automatic;
+        const params = {
+            title,
+            feminized,
+            automatic,
+            slugify: slugify(`${title} ${breeder} ${feminized && 'feminized'} ${automatic && 'automatic'}`)
+        }
         try {
-            await Variety.findOneAndUpdate(
-                { _id },
-                { title },
-                { new: true }
-            );
-            return res.status(201).json({
-                message : _id + ' successful added'
-            });
+            await Variety.findOneAndUpdate({ _id }, params);
+            return res.status(201).json();
         } catch(err) {
             console.log(err);
-            return res.status(422).json({
-                error : err
-            });
+            return res.status(422).send('Error with server [422]');
         }
     }),
 
