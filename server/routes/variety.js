@@ -5,8 +5,6 @@ import slugify from "slugify";
 
 const app = express();
 
-const slugifyVariety = (title, fem, auto) => slugify(`${title} ${fem && 'feminized'} ${auto && 'automatic'}`)
-
 export default {
 
     /**
@@ -32,7 +30,11 @@ export default {
             title,
             feminized,
             automatic,
-            slug: slugifyVariety(title, feminized, automatic)
+            slug: [
+                slugify(title),
+                feminized ? 'feminized' : null,
+                automatic ? 'automatic' : null
+            ].filter(Boolean).join('-')
         }
 
         try {
@@ -56,7 +58,11 @@ export default {
             title,
             feminized,
             automatic,
-            slug: slugifyVariety(title, feminized, automatic)
+            slug: [
+                slugify(title),
+                feminized ? 'feminized' : null,
+                automatic ? 'automatic' : null
+            ].filter(Boolean).join('-')
         }
         try {
             await Variety.findOneAndUpdate({ _id }, params);
