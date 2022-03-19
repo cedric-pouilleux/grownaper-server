@@ -27,36 +27,31 @@ export default {
      * Add new plant
      */
     postAdd: app.post('/add', async (req, res) => {
-        const { createdAt, breeder, variety } = req.body;
         const _id = new mongoose.Types.ObjectId();
-        //TODO use baseurl
-        const qrcode = 'https://elegant-brahmagupta-4cd12e.netlify.app/plant/' + _id;
-        Plant.create({ _id, createdAt, breeder, variety, qrcode }, async (err, variety) => {
-            if(err){
-                return res.status(422).json({
-                    error : err
-                });
-            }
-            return res.status(201).json({
-                message : variety + ' successful added',
-                variety
+        try {
+            await Plant.create({
+                _id,
+                ...req.body,
+                qrcode : 'https://elegant-brahmagupta-4cd12e.netlify.app/plant/' + _id
             });
-        });
+            return res.status(201).json({
+                message : _id + ' successful added',
+            });
+        } catch(err) {
+            console.error(err);
+            return res.status(422).json({ err }).end();
+        }
     }),
 
     /**
      * Edit plant
      */
     edit: app.put('/edit', async (req, res) => {
-        const { id, breeder, variety, createdAt } = req.body;
+        const _id = req.body._id;
         try {
-            await Plant.findOneAndUpdate(
-                { _id: id },
-                { variety, breeder, createdAt: new Date(createdAt)},
-                { new: true }
-            );
+            await Plant.findOneAndUpdate({ _id }, req.body, { new: true });
             return res.status(201).json({
-                message : id + ' successful added'
+                message : _id + ' successful added'
             });
         } catch(err) {
             console.log(err);
