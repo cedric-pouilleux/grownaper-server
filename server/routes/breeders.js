@@ -60,13 +60,12 @@ export default {
         '/add',
         upload.single('picture'),
         async (req, res) => {
-            let param = {
+            Breeders.create({
                 title: req.body.title,
                 link: req.body.link,
                 country: req.body.country,
                 ...(req.file?.location && {picture: req.file.location})
-            };
-            Breeders.create(param, async (err, breeder) => {
+            },async (err, breeder) => {
                 if(err){
                     return res.status(422).json({
                         error : err
@@ -87,17 +86,15 @@ export default {
         upload.single('picture'),
         async (req, res) => {
             const { _id } = req.body;
-            const editParam = {
-                title: req.body.title,
-                link: req.body.link,
-                country: req.body.country,
-                ...(req.file?.location && {picture: req.file.location})
-            };
-
             try {
                 await Breeders.findOneAndUpdate(
                     { _id },
-                    editParam,
+                    {
+                        title: req.body.title,
+                        link: req.body.link,
+                        country: req.body.country,
+                        ...(req.file?.location && {picture: req.file.location})
+                    },
                     { new: true }
                 );
                 return res.status(201).json({

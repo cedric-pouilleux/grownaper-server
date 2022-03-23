@@ -1,7 +1,7 @@
 import express from 'express';
 import "../utils/database";
 import {Variety} from '../models';
-import slugify from "slugify";
+import { varietyPayloadBuilder } from "../utils/builders";
 
 const app = express();
 
@@ -23,22 +23,9 @@ export default {
      * Add new variety
      */
     postAdd: app.post('/add', async (req, res) => {
-        const title = req.body.title;
-        const feminized = req.body.feminized;
-        const automatic = req.body.automatic;
-        const obj = {
-            title,
-            feminized,
-            automatic,
-            slug: [
-                slugify(title),
-                feminized ? 'feminized' : null,
-                automatic ? 'automatic' : null
-            ].filter(Boolean).join('-')
-        }
-
+        const params = varietyPayloadBuilder(req.body);
         try {
-            await Variety.create(obj);
+            await Variety.create(params);
             return res.status(201).json();
         } catch(err) {
             console.log(err);
@@ -51,19 +38,7 @@ export default {
      */
     edit: app.put('/edit', async (req, res) => {
         const _id = req.body._id;
-        const title = req.body.title;
-        const feminized = req.body.feminized;
-        const automatic = req.body.automatic;
-        const params = {
-            title,
-            feminized,
-            automatic,
-            slug: [
-                slugify(title),
-                feminized ? 'feminized' : null,
-                automatic ? 'automatic' : null
-            ].filter(Boolean).join('-')
-        }
+        const params = varietyPayloadBuilder(req.body);
         try {
             await Variety.findOneAndUpdate({ _id }, params);
             return res.status(201).json();
