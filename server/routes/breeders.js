@@ -60,17 +60,20 @@ export default {
         '/add',
         upload.single('picture'),
         async (req, res) => {
-            const { title, link, country } = req.body;
-            const picture = req.file.location;
-            console.log(req.file);
-            Breeders.create({ title, picture, link, country }, async (err, breeder) => {
+            let param = {
+                title: req.body.title,
+                link: req.body.link,
+                country: req.body.country,
+                ...(req.file?.location && {picture: req.file.location})
+            };
+            Breeders.create(param, async (err, breeder) => {
                 if(err){
                     return res.status(422).json({
                         error : err
                     });
                 }
                 return res.status(201).json({
-                    message : title + ' successful added',
+                    message : param.title + ' successful added',
                     breeder
                 });
             });
@@ -79,23 +82,33 @@ export default {
     /**
      * Edit breeder
      */
-    edit: app.put('/edit', async (req, res) => {
-        const { _id, title, picture, link, country } = req.body;
-        try {
-            await Breeders.findOneAndUpdate(
-                { _id },
-                { title, picture, link, country },
-                { new: true }
-            );
-            return res.status(201).json({
-                message : _id + ' successful added'
-            });
-        } catch(err) {
-            console.log(err);
-            return res.status(422).json({
-                error : err
-            });
-        }
+    edit: app.put(
+        '/edit',
+        upload.single('picture'),
+        async (req, res) => {
+            const { _id } = req.body;
+            const editParam = {
+                title: req.body.title,
+                link: req.body.link,
+                country: req.body.country,
+                ...(req.file?.location && {picture: req.file.location})
+            };
+
+            try {
+                await Breeders.findOneAndUpdate(
+                    { _id },
+                    editParam,
+                    { new: true }
+                );
+                return res.status(201).json({
+                    message : _id + ' successful added'
+                });
+            } catch(err) {
+                console.log(err);
+                return res.status(422).json({
+                    error : err
+                });
+            }
     }),
 
     /**
