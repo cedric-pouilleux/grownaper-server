@@ -21,7 +21,7 @@ const varietySchema = new Schema({
     },
     floTime: {
         type: Number,
-        default: 0
+        default: 80
     },
     breeders: [{  type: Schema.Types.ObjectId, ref: 'Breeder'}]
 });

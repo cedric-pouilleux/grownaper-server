@@ -36,15 +36,9 @@ export default {
             breeder: req.body.breeder,
             variety: req.body.variety,
         }
-        try {
-            await Plant.create(obj);
-            return res.status(201).json({
-                message : _id + ' successful added',
-            });
-        } catch(err) {
-            console.error(err);
-            return res.status(422).json({ err }).end();
-        }
+        Plant.create(obj)
+            .then(result => res.status(201).send(_id + 'successful added'))
+            .catch(err => res.status(422).send(err));
     }),
 
     /**
@@ -52,23 +46,14 @@ export default {
      */
     edit: app.put('/edit', async (req, res) => {
         const _id = req.body._id;
-        const params =  {
-            name: req.body.name,
-            createdAt: req.body.createdAt,
-            breeder: req.body.breeder,
-            variety: req.body.variety,
-        }
-        try {
-            await Plant.findOneAndUpdate({ _id }, params);
-            return res.status(201).json({
-                message : _id + ' successful added'
-            });
-        } catch(err) {
-            console.error(err);
-            return res.status(422).json({
-                error : err
-            });
-        }
+        Plant.findOneAndUpdate({ _id }, {
+                name: req.body.name,
+                createdAt: req.body.createdAt,
+                breeder: req.body.breeder,
+                variety: req.body.variety,
+            })
+            .then(result => res.status(201).send(_id + 'successful added'))
+            .catch(err => res.status(422).send(err));
     }),
 
     /**
@@ -76,15 +61,9 @@ export default {
      */
     delete: app.delete('/delete/:id', async (req, res) => {
         const id = req.params.id;
-        Plant.deleteOne({ '_id': id }, async (err) => {
-            if(err){
-                console.log(err);
-                return res.status(422).end();
-            }
-            return res.status(201).json({
-                message: id + 'Has beed delete'
-            });
-        });
+        Plant.deleteOne({ '_id': id })
+            .then(() => res.status(201).send(id + 'Has been delete'))
+            .catch((err) => res.status(422).send(err.message).end());
     })
 
 };
