@@ -14,10 +14,9 @@ export default {
        Plant.find({})
             .populate('breeder')
             .populate('variety')
-            .exec(function (err, result) {
-                if (err) {
-                    console.log(err);
-                    res.status(404).end();
+            .exec((err, result) => {
+                if (err && !result) {
+                    res.status(404).send(err);
                 }
                 res.status(200).json(result);
             });
@@ -63,7 +62,7 @@ export default {
         const id = req.params.id;
         Plant.deleteOne({ '_id': id })
             .then(() => res.status(201).send(id + 'Has been delete'))
-            .catch((err) => res.status(422).send(err.message).end());
+            .catch((err) => res.status(422).send(err.message));
     })
 
 };

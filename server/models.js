@@ -3,10 +3,12 @@ import "./utils/database";
 import {
     breederSchema,
     plantSchema,
-    varietySchema
+    varietySchema,
+    feederSchema
 } from "./schemas";
 
 const Breeders = mongoose.model('Breeder', breederSchema, 'breeders');
+const Feeders = mongoose.model('Feeder', feederSchema, 'feeders');
 const Plant = mongoose.model('Plant', plantSchema, 'plants');
 const Variety = mongoose.model('Variety', varietySchema, 'varieties');
 
@@ -14,4 +16,5 @@ export {
     Breeders,
     Plant,
     Variety,
+    Feeders
 }
