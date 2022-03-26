@@ -2,22 +2,22 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 import slugify from 'slugify-mongoose';
 
-const feederSchema = new Schema({
+const feederProductSchema = new Schema({
     title: {
         type: String,
         required: true,
         minLength: 3,
-        unique: true
-    },
-    description: {
-      type: String,
-      required: false,
     },
     slug: {
         type: String,
         slug: 'title',
+        unique: true
     },
     picture: {
+        type: String,
+        required: false
+    },
+    description: {
         type: String,
         required: false
     },
@@ -25,10 +25,13 @@ const feederSchema = new Schema({
         type: String,
         required: false
     },
-    products: [{  type: Schema.Types.ObjectId, ref: 'FeederProduct'}]
+    feeder: {
+        type: Schema.Types.ObjectId,
+        ref: 'Feeder',
+        required: true
+    }
 });
 
+feederProductSchema.plugin(slugify);
 
-feederSchema.plugin(slugify);
-
-export default feederSchema;
+export default feederProductSchema;

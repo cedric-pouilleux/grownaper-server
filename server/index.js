@@ -1,5 +1,11 @@
 import express from "express";
-import { breederRoutes, varietyRoutes, plantRoutes, feederRoutes } from "./routes";
+import {
+    breederRoutes,
+    varietyRoutes,
+    plantRoutes,
+    feederRoutes,
+    feederProductRoutes
+} from "./routes";
 import cors from "cors";
 
 const bodyParser = require('body-parser')
@@ -30,9 +36,14 @@ app.use('/plant', plantRoutes.delete);
 app.use('/plant', plantRoutes.edit);
 
 app.use('/feeders', feederRoutes.get);
-app.use('/feeder', feederRoutes.add);
-app.use('/feeder', feederRoutes.edit);
-app.use('/feeder', feederRoutes.remove);
+app.use('/feeders', feederRoutes.add);
+app.use('/feeders', feederRoutes.edit);
+app.use('/feeders', feederRoutes.remove);
+
+app.use('/feeders-products', feederProductRoutes.get);
+app.use('/feeders-products', feederProductRoutes.add);
+app.use('/feeders-products', feederProductRoutes.edit);
+app.use('/feeders-products', feederProductRoutes.remove);
 
 app.listen(process.env.PORT || 3000, function() {
     console.log('server running on port 3000', '');
