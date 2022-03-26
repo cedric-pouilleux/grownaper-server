@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import slugify from "slugify-mongoose";
 const { Schema } = mongoose;
 
 const varietySchema = new Schema({
@@ -9,12 +8,22 @@ const varietySchema = new Schema({
     },
     slug: {
         type: String,
-        slug: 'title',
-        unique: true
+        required: true,
+        unique: true,
+    },
+    feminized: {
+        type: Boolean,
+        default: false
+    },
+    automatic: {
+        type: Boolean,
+        default: false
+    },
+    floTime: {
+        type: Number,
+        default: 80
     },
     breeders: [{  type: Schema.Types.ObjectId, ref: 'Breeder'}]
 });
-
-varietySchema.plugin(slugify);
 
 export default varietySchema;

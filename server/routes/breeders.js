@@ -1,6 +1,7 @@
 import express from 'express';
 import "../utils/database";
-import {Breeders, Plant} from '../models';
+import {Breeders} from '../models';
+import {Upload} from '../utils/upload'
 
 const app = express();
 
@@ -9,7 +10,7 @@ export default {
     /**
      * Get all breeders
      */
-    getAll : app.get('/', async (req, res) => {
+    all : app.get('/', async (req, res) => {
         const result = await Breeders.find({});
         if(result){
             res.status(200).json(result);
@@ -21,41 +22,53 @@ export default {
     /**
      * Add new breeder
      */
-    postAdd: app.post('/add', async (req, res) => {
-        const { title, picture, link, country } = req.body;
-        Breeders.create({ title, picture, link, country }, async (err, breeder) => {
-            if(err){
-                return res.status(422).json({
-                    error : err
-                });
-            }
-            return res.status(201).json({
-                message : title + ' successful added',
-                breeder
+    add: app.post(
+        '/add',
+        Upload.single('picture'),
+        async (req, res) => {
+            Breeders.create({
+                title: req.body.title,
+                link: req.body.link,
+                country: req.body.country,
+                ...(req.file?.location && {picture: req.file.location})
+            },async (err, breeder) => {
+                if(err){
+                    return res.status(422).json({
+                        error : err
+                    });
+                }
+                return res.status(201).send('successful added');
             });
-        });
-    }),
+        }),
 
     /**
      * Edit breeder
      */
-    edit: app.put('/edit', async (req, res) => {
-        const { id, title, picture, link, country } = req.body;
-        try {
-            await Breeders.findOneAndUpdate(
-                { _id: id },
-                { title, picture, link, country },
-                { new: true }
-            );
-            return res.status(201).json({
-                message : id + ' successful added'
-            });
-        } catch(err) {
-            console.log(err);
-            return res.status(422).json({
-                error : err
-            });
-        }
+    edit: app.put(
+        '/edit',
+        Upload.single('picture'),
+        async (req, res) => {
+            const { _id } = req.body;
+            try {
+                await Breeders.findOneAndUpdate(
+                    { _id },
+                    {
+                        title: req.body.title,
+                        link: req.body.link,
+                        country: req.body.country,
+                        ...(req.file?.location && {picture: req.file.location})
+                    },
+                    { new: true }
+                );
+                return res.status(201).json({
+                    message : _id + ' successful added'
+                });
+            } catch(err) {
+                console.log(err);
+                return res.status(422).json({
+                    error : err
+                });
+            }
     }),
 
     /**

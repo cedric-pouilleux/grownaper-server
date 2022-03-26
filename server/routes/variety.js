@@ -1,6 +1,7 @@
 import express from 'express';
 import "../utils/database";
-import {Breeders, Variety} from '../models';
+import {Variety} from '../models';
+import { varietyPayloadBuilder } from "../utils/builders";
 
 const app = express();
 
@@ -22,40 +23,28 @@ export default {
      * Add new variety
      */
     postAdd: app.post('/add', async (req, res) => {
-        const title = req.body.title;
-        Variety.create({ title: title }, async (err, variety) => {
-            if(err){
-                console.log(err);
-                return res.status(422).json({
-                    error : err
-                });
-            }
-            return res.status(201).json({
-                message : title + ' successful added',
-                variety
-            });
-        });
+        const params = varietyPayloadBuilder(req.body);
+        try {
+            await Variety.create(params);
+            return res.status(201).json();
+        } catch(err) {
+            console.log(err);
+            return res.status(422).send('Error with server [422]');
+        }
     }),
 
     /**
      * Edit variety
      */
     edit: app.put('/edit', async (req, res) => {
-        const { _id, title } = req.body;
+        const _id = req.body._id;
+        const params = varietyPayloadBuilder(req.body);
         try {
-            await Variety.findOneAndUpdate(
-                { _id },
-                { title },
-                { new: true }
-            );
-            return res.status(201).json({
-                message : _id + ' successful added'
-            });
+            await Variety.findOneAndUpdate({ _id }, params);
+            return res.status(201).json();
         } catch(err) {
             console.log(err);
-            return res.status(422).json({
-                error : err
-            });
+            return res.status(422).send('Error with server [422]');
         }
     }),
 

@@ -14,10 +14,9 @@ export default {
        Plant.find({})
             .populate('breeder')
             .populate('variety')
-            .exec(function (err, result) {
-                if (err) {
-                    console.log(err);
-                    res.status(404).end();
+            .exec((err, result) => {
+                if (err && !result) {
+                    res.status(404).send(err);
                 }
                 res.status(200).json(result);
             });
@@ -27,43 +26,33 @@ export default {
      * Add new plant
      */
     postAdd: app.post('/add', async (req, res) => {
-        const { createdAt, breeder, variety } = req.body;
-        const _id = new mongoose.Types.ObjectId();
-        //TODO use baseurl
-        const qrcode = 'https://elegant-brahmagupta-4cd12e.netlify.app/plant/' + _id;
-        Plant.create({ _id, createdAt, breeder, variety, qrcode }, async (err, variety) => {
-            if(err){
-                return res.status(422).json({
-                    error : err
-                });
-            }
-            return res.status(201).json({
-                message : variety + ' successful added',
-                variety
-            });
-        });
+        const _id = new mongoose.mongo.ObjectId();
+        const obj = {
+            _id,
+            name: req.body.name,
+            createdAt: req.body.createdAt,
+            qrcode: 'https://elegant-brahmagupta-4cd12e.netlify.app/plant/' + _id,
+            breeder: req.body.breeder,
+            variety: req.body.variety,
+        }
+        Plant.create(obj)
+            .then(result => res.status(201).send(_id + 'successful added'))
+            .catch(err => res.status(422).send(err));
     }),
 
     /**
      * Edit plant
      */
     edit: app.put('/edit', async (req, res) => {
-        const { id, breeder, variety, createdAt } = req.body;
-        try {
-            await Plant.findOneAndUpdate(
-                { _id: id },
-                { variety, breeder, createdAt: new Date(createdAt)},
-                { new: true }
-            );
-            return res.status(201).json({
-                message : id + ' successful added'
-            });
-        } catch(err) {
-            console.log(err);
-            return res.status(422).json({
-                error : err
-            });
-        }
+        const _id = req.body._id;
+        Plant.findOneAndUpdate({ _id }, {
+                name: req.body.name,
+                createdAt: req.body.createdAt,
+                breeder: req.body.breeder,
+                variety: req.body.variety,
+            })
+            .then(result => res.status(201).send(_id + 'successful added'))
+            .catch(err => res.status(422).send(err));
     }),
 
     /**
@@ -71,15 +60,9 @@ export default {
      */
     delete: app.delete('/delete/:id', async (req, res) => {
         const id = req.params.id;
-        Plant.deleteOne({ '_id': id }, async (err) => {
-            if(err){
-                console.log(err);
-                return res.status(422).end();
-            }
-            return res.status(201).json({
-                message: id + 'Has beed delete'
-            });
-        });
+        Plant.deleteOne({ '_id': id })
+            .then(() => res.status(201).send(id + 'Has been delete'))
+            .catch((err) => res.status(422).send(err.message));
     })
 
 };
