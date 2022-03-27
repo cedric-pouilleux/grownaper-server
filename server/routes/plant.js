@@ -33,6 +33,8 @@ export default {
             createdAt: req.body.createdAt,
             qrcode: 'https://elegant-brahmagupta-4cd12e.netlify.app/plant/' + _id,
             breeder: req.body.breeder,
+            feminized: req.body.feminized,
+            automatic: req.body.automatic,
             variety: req.body.variety,
         }
         Plant.create(obj)
@@ -50,6 +52,8 @@ export default {
                 createdAt: req.body.createdAt,
                 breeder: req.body.breeder,
                 variety: req.body.variety,
+                feminized: req.body.feminized,
+                automatic: req.body.automatic,
             })
             .then(result => res.status(201).send(_id + 'successful added'))
             .catch(err => res.status(422).send(err));

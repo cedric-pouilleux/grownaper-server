@@ -11,14 +11,6 @@ const varietySchema = new Schema({
         required: true,
         unique: true,
     },
-    feminized: {
-        type: Boolean,
-        default: false
-    },
-    automatic: {
-        type: Boolean,
-        default: false
-    },
     floTime: {
         type: Number,
         default: 80

@@ -1,6 +1,6 @@
 import express from 'express';
 import "../utils/database";
-import {Variety} from '../models';
+import {Breeders, Feeders, Variety} from '../models';
 import { varietyPayloadBuilder } from "../utils/builders";
 
 const app = express();
@@ -11,11 +11,11 @@ export default {
      * Get all varieties
      */
     getAll : app.get('/', async (req, res) => {
-        const result = await Variety.find({});
-        if(result){
-            res.status(200).json(result);
-        } else {
-            res.status(404);
+        try {
+            const result = await Variety.find({});
+            return res.status(200).json(result);
+        } catch(err) {
+            return res.status(404).send(err);
         }
     }),
 
@@ -25,10 +25,16 @@ export default {
     postAdd: app.post('/add', async (req, res) => {
         const params = varietyPayloadBuilder(req.body);
         try {
+            const breeders = params.breeders;
+            if(breeders){
+                await Breeders.findByIdAndUpdate(feeder,
+                    { $addToSet: {varieties: { $each: breeders }}}
+                    );
+            }
+            console.log(params);
             await Variety.create(params);
             return res.status(201).json();
         } catch(err) {
-            console.log(err);
             return res.status(422).send('Error with server [422]');
         }
     }),
@@ -43,7 +49,6 @@ export default {
             await Variety.findOneAndUpdate({ _id }, params);
             return res.status(201).json();
         } catch(err) {
-            console.log(err);
             return res.status(422).send('Error with server [422]');
         }
     }),

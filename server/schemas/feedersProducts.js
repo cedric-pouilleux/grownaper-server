@@ -7,6 +7,7 @@ const feederProductSchema = new Schema({
         type: String,
         required: true,
         minLength: 3,
+        unique: true,
     },
     slug: {
         type: String,

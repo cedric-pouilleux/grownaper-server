@@ -5,11 +5,14 @@ const varietyPayloadBuilder = (param) => {
     const feminized = param.feminized;
     const automatic = param.automatic;
     const floTime = param.floTime;
+    const breeders = param.breeders;
+
     return {
         title,
         feminized,
         automatic,
         floTime,
+        breeders,
         slug: [
             slugify(title),
             feminized ? 'feminized' : null,
