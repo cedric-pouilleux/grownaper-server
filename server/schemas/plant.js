@@ -8,23 +8,6 @@ const plantSchema = new Schema({
         type: String,
         required: false
     },
-    phenotype: {
-        type: Number,
-        required: true
-    },
-    feminized: {
-        type: Boolean,
-        default: false
-    },
-    automatic: {
-        type: Boolean,
-        default: false
-    },
-    breeder: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Breeder',
-        required: true
-    },
     variety: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Variety',

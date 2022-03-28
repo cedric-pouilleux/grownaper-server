@@ -15,7 +15,22 @@ const varietySchema = new Schema({
         type: Number,
         default: 80
     },
-    breeders: [{  type: Schema.Types.ObjectId, ref: 'Breeder'}]
+    phenotype: {
+        type: Number,
+        required: true
+    },
+    feminized: {
+        type: Boolean,
+        default: false
+    },
+    automatic: {
+        type: Boolean,
+        default: false
+    },
+    breeder: {
+        type: Schema.Types.ObjectId,
+        ref: 'Breeder'
+    }
 });
 
 export default varietySchema;

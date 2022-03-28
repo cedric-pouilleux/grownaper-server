@@ -23,15 +23,8 @@ export default {
      * Add new variety
      */
     postAdd: app.post('/add', async (req, res) => {
-        const params = varietyPayloadBuilder(req.body);
         try {
-            const breeders = params.breeders;
-            if(breeders){
-                await Breeders.findByIdAndUpdate(feeder,
-                    { $addToSet: {varieties: { $each: breeders }}}
-                    );
-            }
-            console.log(params);
+            const params = varietyPayloadBuilder(req.body);
             await Variety.create(params);
             return res.status(201).json();
         } catch(err) {

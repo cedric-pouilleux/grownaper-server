@@ -32,6 +32,7 @@ app.use('/variety', varietyRoutes.edit);
 
 app.use('/plants', plantRoutes.getAll);
 app.use('/plant', plantRoutes.postAdd);
+app.use('/plant', plantRoutes.addNote);
 app.use('/plant', plantRoutes.delete);
 app.use('/plant', plantRoutes.edit);
 
