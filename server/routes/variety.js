@@ -1,6 +1,6 @@
 import express from 'express';
 import "../utils/database";
-import {Breeders, Feeders, Variety} from '../models';
+import {Breeders, Feeders, Plant, Variety} from '../models';
 import { varietyPayloadBuilder } from "../utils/builders";
 
 const app = express();
@@ -11,13 +11,14 @@ export default {
      * Get all varieties
      */
     getAll : app.get('/', async (req, res) => {
-        try {
-            const result = await Variety.find({});
-            return res.status(200).json(result);
-        } catch(err) {
-            console.log(err);
-            return res.status(404).send(err);
-        }
+        Variety.find({})
+            .populate('breeder')
+            .exec((err, result) => {
+                if (err && !result) {
+                    res.status(404).send(err);
+                }
+                res.status(200).json(result);
+            });
     }),
 
     /**
