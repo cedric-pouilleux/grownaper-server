@@ -13,6 +13,8 @@ const varietyPayloadBuilder = (param) => {
     const breeder = param.breeder;
     const phenotype = param.phenotype;
 
+    console.log(breeder);
+
     return {
         title,
         phenotype,
@@ -22,8 +24,10 @@ const varietyPayloadBuilder = (param) => {
         breeder,
         slug: [
             slugify(title),
+            slugify(breeder.title, { lower: true }),
             feminized ? 'feminized' : null,
-            automatic ? 'automatic' : null
+            automatic ? 'automatic' : null,
+            phenotype ? '#' + phenotype : null
         ].filter(Boolean).join('-')
     }
 

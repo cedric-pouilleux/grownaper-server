@@ -15,6 +15,7 @@ export default {
             const result = await Variety.find({});
             return res.status(200).json(result);
         } catch(err) {
+            console.log(err);
             return res.status(404).send(err);
         }
     }),
@@ -28,6 +29,7 @@ export default {
             await Variety.create(params);
             return res.status(201).json();
         } catch(err) {
+            console.log(err);
             return res.status(422).send('Error with server [422]');
         }
     }),
