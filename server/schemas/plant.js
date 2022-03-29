@@ -8,16 +8,15 @@ const plantSchema = new Schema({
         type: String,
         required: false
     },
-    breeder: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Breeder',
-        required: true
-    },
     variety: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Variety',
         required: true
-    }
+    },
+    notes: [{
+        date: Date,
+        content: String
+    }]
 });
 
 export default plantSchema;
