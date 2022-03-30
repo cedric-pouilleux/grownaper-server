@@ -1,6 +1,6 @@
 import express from 'express';
 import "../utils/database";
-import {Feeders, FeedersProducts} from '../models';
+import {Feeders, FeedersProducts, Variety} from '../models';
 import {Upload} from "../utils/upload";
 import mongoose from "mongoose";
 
@@ -9,12 +9,14 @@ const app = express();
 export default {
 
     get: app.get('/', async (req, res) => {
-        try {
-            const result = await FeedersProducts.find({});
-            return res.status(200).json(result);
-        } catch(err){
-            return res.status(404).send(err);
-        }
+        FeedersProducts.find({})
+            .populate('feeder')
+            .exec((err, result) => {
+                if (err && !result) {
+                    res.status(404).send(err);
+                }
+                res.status(200).json(result);
+            });
     }),
 
     add: app.post(
