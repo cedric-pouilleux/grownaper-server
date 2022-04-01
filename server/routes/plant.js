@@ -12,7 +12,10 @@ export default {
      */
     getAll : app.get('/', (req, res) => {
        Plant.find({})
-            .populate('variety')
+            .populate({
+                path: 'variety',
+                populate: { path: 'breeder' }
+            })
             .exec((err, result) => {
                 if (err && !result) {
                     res.status(404).send(err);

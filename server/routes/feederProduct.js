@@ -1,6 +1,6 @@
 import express from 'express';
 import "../utils/database";
-import {Feeders, FeedersProducts, Variety} from '../models';
+import {Feeders, FeedersProducts} from '../models';
 import {Upload} from "../utils/upload";
 import mongoose from "mongoose";
 
