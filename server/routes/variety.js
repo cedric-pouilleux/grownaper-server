@@ -1,7 +1,8 @@
 import express from 'express';
 import "../utils/database";
-import {Breeders, Feeders, Plant, Variety} from '../models';
+import {Breeders, Variety} from '../models';
 import { varietyPayloadBuilder } from "../utils/builders";
+import mongoose from "mongoose";
 
 const app = express();
 
@@ -25,10 +26,15 @@ export default {
      * Add new variety
      */
     postAdd: app.post('/add', async (req, res) => {
+        const _id = new mongoose.mongo.ObjectId();
+        const params = varietyPayloadBuilder(req.body);
+        const breeder = req.body.breeder;
         try {
-            const params = varietyPayloadBuilder(req.body);
-            await Variety.create(params);
-            return res.status(201).json();
+            await Variety.create({ ...params, _id});
+            if(breeder){
+                await Breeders.findByIdAndUpdate(breeder,{ $addToSet: { varieties: _id } });
+            }
+            return res.status(201).send('Add Success');
         } catch(err) {
             console.log(err);
             return res.status(422).send('Error with server [422]');
@@ -41,9 +47,16 @@ export default {
     edit: app.put('/edit', async (req, res) => {
         const _id = req.body._id;
         const params = varietyPayloadBuilder(req.body);
+        const breeder = req.body.breeder;
         try {
+            if(breeder){
+                const find = await Variety.findOne({_id});
+                const old = find.breeder;
+                await Breeders.findByIdAndUpdate(breeder, { $addToSet: { varieties: _id } });
+                await Breeders.findByIdAndUpdate(old, { $pull: { varieties: _id } });
+            }
             await Variety.findOneAndUpdate({ _id }, params);
-            return res.status(201).json();
+            return res.status(201).send('Success edit');
         } catch(err) {
             return res.status(422).send('Error with server [422]');
         }
@@ -54,14 +67,16 @@ export default {
      */
     delete: app.delete('/delete/:id', async (req, res) => {
         const id = req.params.id;
-        Variety.deleteOne({ '_id': id }, async (err) => {
-            if(err){
-                return res.status(422).end();
+        try {
+            const select = await Variety.findById(id);
+            if(select.breeder){
+                await Breeders.findByIdAndUpdate(select.breeder, { $pull: { varieties: id } });
             }
-            return res.status(201).json({
-                message: id + 'Has beed delete'
-            });
-        });
+            await select.remove();
+            return res.status(201).send('Success delete');
+        } catch(err) {
+            return res.status(422).send('Error with server [422]');
+        }
     })
 
 };
