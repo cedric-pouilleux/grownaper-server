@@ -4,6 +4,7 @@ const { Schema } = mongoose;
 const plantSchema = new Schema({
     createdAt: Date,
     qrcode: String,
+    startFloweringDate: Date,
     name: {
         type: String,
         required: false
@@ -16,6 +17,11 @@ const plantSchema = new Schema({
     notes: [{
         date: Date,
         content: String
+    }],
+    history: [{
+        date: Date,
+        action: String,
+        message: String,
     }]
 });
 

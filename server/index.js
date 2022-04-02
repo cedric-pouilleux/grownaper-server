@@ -6,7 +6,8 @@ import {
     feederRoutes,
     feederProductRoutes
 } from "./routes";
-import cors from "cors";
+import cors from 'cors';
+import './cron/startFloweringHistoryCron';
 
 const bodyParser = require('body-parser')
 const app = express();
@@ -35,6 +36,7 @@ app.use('/plant', plantRoutes.postAdd);
 app.use('/plant', plantRoutes.addNote);
 app.use('/plant', plantRoutes.delete);
 app.use('/plant', plantRoutes.edit);
+app.use('/plant', plantRoutes.editFloweringDate);
 
 app.use('/feeders', feederRoutes.get);
 app.use('/feeders', feederRoutes.add);

@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import "../utils/database";
 import { Plant } from '../models';
+import Moment from 'moment';
 
 const app = express();
 
@@ -12,10 +13,7 @@ export default {
      */
     getAll : app.get('/', (req, res) => {
        Plant.find({})
-            .populate({
-                path: 'variety',
-                populate: { path: 'breeder' }
-            })
+            .populate({ path: 'variety', populate: { path: 'breeder' }})
             .exec((err, result) => {
                 if (err && !result) {
                     res.status(404).send(err);
@@ -29,24 +27,47 @@ export default {
      */
     postAdd: app.post('/add', async (req, res) => {
         const _id = new mongoose.mongo.ObjectId();
+        const date = new Date();
+        const startFloweringDate = req.body.startFloweringDate;
         const obj = {
             _id,
             name: req.body.name,
-            createdAt: req.body.createdAt,
+            createdAt: date,
             qrcode: 'https://elegant-brahmagupta-4cd12e.netlify.app/plant/' + _id,
-            breeder: req.body.breeder,
-            phenotype: req.body.phenotype,
-            feminized: req.body.feminized,
-            automatic: req.body.automatic,
             variety: req.body.variety,
+            startFloweringDate
         }
-        console.log(obj);
-        Plant.create(obj)
-            .then(() => res.status(201).send(_id + 'successful added'))
-            .catch(err => {
-                console.log(err);
-                res.status(422).send(err)
+        try {
+            /**
+             * Try make one request here, create and populate history
+             */
+            const plant = await Plant.create(obj);
+            await plant.save();
+            if(Moment(startFloweringDate).isBefore(date)){
+                await Plant.findByIdAndUpdate(_id, {
+                    $addToSet: {
+                        history: {
+                            date: startFloweringDate,
+                            action: 'START_FLO',
+                            message: 'Starting flowering cycle',
+                        }
+                    }
+                });
+            }
+            await Plant.findByIdAndUpdate(_id, {
+                $addToSet: {
+                    history: {
+                        date: date,
+                        action: 'ADD',
+                        message: 'Creation',
+                    }
+                }
             });
+            return res.status(201).send('Success added');
+        }  catch(err) {
+            console.log(err);
+            return res.status(422).send(err);
+        }
     }),
 
     /**
@@ -71,9 +92,26 @@ export default {
         }
     }),
 
-    /**
-     * Edit plant
-     */
+    editFloweringDate: app.put('/flowering-date/edit/:id', async (req, res) => {
+        const id = req.params.id;
+        const startFloweringDate = req.body.startFloweringDate;
+        try {
+            await Plant.findByIdAndUpdate(id, { startFloweringDate });
+            await Plant.findByIdAndUpdate(id, {
+                $addToSet: {
+                    history: {
+                        date: new Date(),
+                        action: 'EDIT',
+                        message: 'Change start flowering date',
+                    }
+                }
+            });
+            return res.status(201).send(id + 'successful edited');
+        } catch(err) {
+            return res.status(422).send(err);
+        }
+    }),
+
     edit: app.put('/edit', async (req, res) => {
         const _id = req.body._id;
         Plant.findOneAndUpdate({ _id }, {
@@ -84,7 +122,7 @@ export default {
                 feminized: req.body.feminized,
                 automatic: req.body.automatic,
             })
-            .then(result => res.status(201).send(_id + 'successful added'))
+            .then(() => res.status(201).send(_id + 'successful added'))
             .catch(err => res.status(422).send(err));
     }),
 
