@@ -45,6 +45,7 @@ export default {
             await plant.save();
             if(Moment(startFloweringDate).isBefore(date)){
                 await Plant.findByIdAndUpdate(_id, {
+                    floweringStarted: true,
                     $addToSet: {
                         history: {
                             date: startFloweringDate,
@@ -92,22 +93,31 @@ export default {
         }
     }),
 
-    editFloweringDate: app.put('/flowering-date/edit/:id', async (req, res) => {
+    editFloweringDate: app.put('/edit/:id', async (req, res) => {
         const id = req.params.id;
-        const startFloweringDate = req.body.startFloweringDate;
+        const { startFloweringDate, variety } = req.body;
+        const currentDate = Moment();
         try {
-            await Plant.findByIdAndUpdate(id, { startFloweringDate });
-            await Plant.findByIdAndUpdate(id, {
+            const isFlowering = Moment(startFloweringDate).isBefore(currentDate);
+            const find = await Plant.findById(id);
+            const arr = [
+                ... startFloweringDate ? [{ date: currentDate,  action: 'EDIT',  message: 'Change start flowering date' }] : [],
+                ... variety ? [{ date: currentDate, action: 'EDIT', message: 'Change variety' }] : [],
+                ... isFlowering && !find.floweringStarted ? [{ date: currentDate, action: 'START_FLO', message: 'Starting flowering cycle' }] : [],
+            ];
+            await find.update({
+                ... startFloweringDate ? { startFloweringDate: startFloweringDate } : {},
+                ... variety ? { variety: variety } : {} ,
+                ... isFlowering && !find.floweringStarted ? { floweringStarted : true } : {},
                 $addToSet: {
                     history: {
-                        date: new Date(),
-                        action: 'EDIT',
-                        message: 'Change start flowering date',
+                        $each: arr
                     }
                 }
             });
             return res.status(201).send(id + 'successful edited');
         } catch(err) {
+            console.log(err);
             return res.status(422).send(err);
         }
     }),

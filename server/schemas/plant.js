@@ -5,6 +5,7 @@ const plantSchema = new Schema({
     createdAt: Date,
     qrcode: String,
     startFloweringDate: Date,
+    floweringStarted: Boolean,
     name: {
         type: String,
         required: false
