@@ -63,7 +63,6 @@ export default {
             };
             try {
                 if(feeder){
-                    //remove new and old linked products list
                     const find = await FeedersProducts.findOne({_id});
                     const old = find.feeder;
                     await Feeders.findByIdAndUpdate(feeder, { $addToSet: { products: _id } });

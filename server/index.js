@@ -6,7 +6,8 @@ import {
     feederRoutes,
     feederProductRoutes
 } from "./routes";
-import cors from "cors";
+import cors from 'cors';
+import './cron/startFloweringHistoryCron';
 
 const bodyParser = require('body-parser')
 const app = express();
