@@ -25,6 +25,11 @@
   "bugs": {
     "url": "https://github.com/cedric-pouilleux/grownaper-server/issues"
   },
+  "eslintConfig": {
+    "rules": {
+      "vue/max-attributes-per-line": "off"
+    }
+  },
   "homepage": "https://github.com/cedric-pouilleux/grownaper-server#readme",
   "dependencies": {
     "@babel/cli": "^7.17.6",

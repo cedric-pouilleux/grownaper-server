@@ -38,35 +38,31 @@ export default {
             startFloweringDate
         }
         try {
-            /**
-             * Try make one request here, create and populate history
-             */
             const plant = await Plant.create(obj);
             await plant.save();
-            if(Moment(startFloweringDate).isBefore(date)){
-                await Plant.findByIdAndUpdate(_id, {
-                    floweringStarted: true,
-                    $addToSet: {
-                        history: {
-                            date: startFloweringDate,
-                            action: 'START_FLO',
-                            message: 'Starting flowering cycle',
-                        }
-                    }
-                });
-            }
-            await Plant.findByIdAndUpdate(_id, {
-                $addToSet: {
-                    history: {
-                        date: date,
-                        action: 'ADD',
-                        message: 'Creation',
-                    }
+            const isBefore = Moment(startFloweringDate).isBefore(date);
+            const history = [
+                ...isBefore ? [{
+                    date: startFloweringDate,
+                    action: 'START_FLO',
+                    message: 'Starting flowering cycle',
+                }] : [],
+                {
+                    date: date,
+                    action: 'ADD',
+                    message: 'Creation',
                 }
-            });
-            return res.status(201).send('Success added');
+            ];
+            await Plant.findByIdAndUpdate(_id, {
+                    floweringStarted: isBefore,
+                    $addToSet: {
+                        history: { $each: history }
+                    }
+                },
+            { returnDocument: 'after'})
+                .populate({ path: 'variety', populate: { path: 'breeder' }})
+                .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
         }  catch(err) {
-            console.log(err);
             return res.status(422).send(err);
         }
     }),
@@ -93,38 +89,40 @@ export default {
         }
     }),
 
-    editFloweringDate: app.put('/edit/:id', (req, res) => {
-        const id = req.params.id;
-        const { startFloweringDate, variety } = req.body;
-        const currentDate = Moment();
-            const historyTasks = [
-                ... startFloweringDate ? [{ date: currentDate,  action: 'EDIT',  message: 'Change start flowering date' }] : [],
-                ... variety ? [{ date: currentDate, action: 'EDIT', message: 'Change variety' }] : [],
-            ];
-            const data = {
-                ... startFloweringDate ? { startFloweringDate: startFloweringDate } : {},
-                ... variety ? { variety: variety } : {} ,
-            };
-            Plant.findOneAndUpdate(
-                { _id: id },
-                { $set: data, $addToSet: { history: { $each: historyTasks }}},
-                { returnDocument: 'after' })
-                .populate({ path: 'variety', populate: { path: 'breeder' }})
-                .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
-    }),
+    /**
+     * Edit plant by id
+     * Can edit : name, startFloweringDate, variety
+     */
+    edit: app.put('/edit/:id', async (req, res) => {
 
-    edit: app.put('/edit', async (req, res) => {
-        const _id = req.body._id;
-        Plant.findOneAndUpdate({ _id }, {
-                name: req.body.name,
-                createdAt: req.body.createdAt,
-                breeder: req.body.breeder,
-                variety: req.body.variety,
-                feminized: req.body.feminized,
-                automatic: req.body.automatic,
-            })
-            .then(() => res.status(201).send(_id + 'successful added'))
-            .catch(err => res.status(422).send(err));
+        const id = req.params.id;
+        const { startFloweringDate, variety, name } = req.body;
+
+        const currentDate = Moment();
+        const isFlowering = Moment(startFloweringDate).isBefore(currentDate);
+
+        const find = await Plant.findById(id);
+
+        const historyTasks = [
+            ... startFloweringDate ? [{ date: currentDate,  action: 'EDIT',  message: 'Change start flowering date' }] : [],
+            ... variety ? [{ date: currentDate, action: 'EDIT', message: 'Change variety' }] : [],
+            ... name ? [{ date: currentDate, action: 'EDIT', message: 'Change name' }] : [],
+            ... isFlowering && !find.floweringStarted ? [{ date: currentDate, action: 'START_FLO', message: 'Starting flowering cycle' }] : [],
+        ];
+
+        const data = {
+            ... startFloweringDate ? { startFloweringDate: startFloweringDate } : {},
+            ... variety ? { variety: variety } : {},
+            ... name ? { name: name } : {},
+            ... isFlowering && !find.floweringStarted ? { floweringStarted : true } : {},
+        };
+
+        Plant.findOneAndUpdate(
+            { _id: id },
+            { $set: data, $addToSet: { history: { $each: historyTasks }}},
+            { returnDocument: 'after' })
+            .populate({ path: 'variety', populate: { path: 'breeder' }})
+            .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
     }),
 
     /**
