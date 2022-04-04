@@ -148,6 +148,24 @@ export default {
             .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
     }),
 
+    startFlowering: app.put('/start-flowering/:id', (req, res) => {
+        const id = req.params.id;
+        const currentDate = new Date();
+        Plant.findOneAndUpdate(
+            { _id: id },
+            {
+                $set: {
+                    floweringStarted: true,
+                    startFloweringDate: currentDate
+                },
+                $addToSet: {
+                    history: { date: currentDate, action: 'START_FLO', message: 'Starting flowering cycle' }
+                }},
+            { returnDocument: 'after' })
+            .populate({ path: 'variety', populate: { path: 'breeder' }})
+            .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
+    }),
+
     /**
      * Remove plant by id
      */

@@ -37,6 +37,7 @@ app.use('/plant', plantRoutes.addNote);
 app.use('/plant', plantRoutes.delete);
 app.use('/plant', plantRoutes.edit);
 app.use('/plant', plantRoutes.cut);
+app.use('/plant', plantRoutes.startFlowering);
 
 app.use('/feeders', feederRoutes.get);
 app.use('/feeders', feederRoutes.add);

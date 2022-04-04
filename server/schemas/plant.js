@@ -5,7 +5,7 @@ const plantSchema = new Schema({
     createdAt: Date,
     qrcode: String,
     startFloweringDate: Date,
-    floweringStarted: Boolean,
+    floweringStarted: Boolean, //@Todo => this boolean is useless, can refer to the startFloweringDate
     collected: Date,
     name: {
         type: String,
