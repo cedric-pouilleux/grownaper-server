@@ -137,7 +137,7 @@ export default {
             ... startFloweringDate ? { startFloweringDate: startFloweringDate } : {},
             ... variety ? { variety: variety } : {},
             ... name ? { name: name } : {},
-            ... isFlowering && !find.floweringStarted ? { floweringStarted : true } : {},
+            ... isFlowering && !find.floweringStarted ? { floweringStarted : true } : { floweringStarted : false },
         };
 
         Plant.findOneAndUpdate(
