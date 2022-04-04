@@ -33,6 +33,7 @@ export default {
             _id,
             name: req.body.name,
             createdAt: date,
+            collected: null,
             qrcode: 'https://elegant-brahmagupta-4cd12e.netlify.app/plant/' + _id,
             variety: req.body.variety,
             startFloweringDate
@@ -87,6 +88,28 @@ export default {
         } catch(err) {
             return res.status(422).send(err);
         }
+    }),
+
+    /**
+     * Cut plant by id
+     */
+    cut: app.put('/cut/:id', (req, res) => {
+        const id = req.params.id;
+        Plant.findOneAndUpdate(
+            { _id: id },
+                {
+                    collected: new Date(),
+                    $addToSet: {
+                        history: {
+                            date: new Date(),
+                            action: 'COLLECT',
+                            message: 'Collect',
+                        }
+                    }
+                },
+            { returnDocument: 'after' })
+            .populate({ path: 'variety', populate: { path: 'breeder' }})
+            .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
     }),
 
     /**
