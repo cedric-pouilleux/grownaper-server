@@ -33,6 +33,7 @@ export default {
             _id,
             name: req.body.name,
             createdAt: date,
+            collected: null,
             qrcode: 'https://elegant-brahmagupta-4cd12e.netlify.app/plant/' + _id,
             variety: req.body.variety,
             startFloweringDate
@@ -90,6 +91,28 @@ export default {
     }),
 
     /**
+     * Cut plant by id
+     */
+    cut: app.put('/cut/:id', (req, res) => {
+        const id = req.params.id;
+        Plant.findOneAndUpdate(
+            { _id: id },
+                {
+                    collected: new Date(),
+                    $addToSet: {
+                        history: {
+                            date: new Date(),
+                            action: 'COLLECT',
+                            message: 'Collect',
+                        }
+                    }
+                },
+            { returnDocument: 'after' })
+            .populate({ path: 'variety', populate: { path: 'breeder' }})
+            .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
+    }),
+
+    /**
      * Edit plant by id
      * Can edit : name, startFloweringDate, variety
      */
@@ -114,12 +137,30 @@ export default {
             ... startFloweringDate ? { startFloweringDate: startFloweringDate } : {},
             ... variety ? { variety: variety } : {},
             ... name ? { name: name } : {},
-            ... isFlowering && !find.floweringStarted ? { floweringStarted : true } : {},
+            ... isFlowering && !find.floweringStarted ? { floweringStarted : true } : { floweringStarted : false },
         };
 
         Plant.findOneAndUpdate(
             { _id: id },
             { $set: data, $addToSet: { history: { $each: historyTasks }}},
+            { returnDocument: 'after' })
+            .populate({ path: 'variety', populate: { path: 'breeder' }})
+            .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
+    }),
+
+    startFlowering: app.put('/start-flowering/:id', (req, res) => {
+        const id = req.params.id;
+        const currentDate = new Date();
+        Plant.findOneAndUpdate(
+            { _id: id },
+            {
+                $set: {
+                    floweringStarted: true,
+                    startFloweringDate: currentDate
+                },
+                $addToSet: {
+                    history: { date: currentDate, action: 'START_FLO', message: 'Starting flowering cycle' }
+                }},
             { returnDocument: 'after' })
             .populate({ path: 'variety', populate: { path: 'breeder' }})
             .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
