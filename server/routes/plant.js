@@ -117,28 +117,53 @@ export default {
      * Can edit : name, startFloweringDate, variety
      */
     edit: app.put('/edit/:id', async (req, res) => {
-
         const id = req.params.id;
         const { startFloweringDate, variety, name } = req.body;
-
         const currentDate = Moment();
         const isFlowering = Moment(startFloweringDate).isBefore(currentDate);
-
         const find = await Plant.findById(id);
+        const historyTasks = [];
+        const data = {};
 
-        const historyTasks = [
-            ... startFloweringDate ? [{ date: currentDate,  action: 'EDIT',  message: 'Change start flowering date' }] : [],
-            ... variety ? [{ date: currentDate, action: 'EDIT', message: 'Change variety' }] : [],
-            ... name ? [{ date: currentDate, action: 'EDIT', message: 'Change name' }] : [],
-            ... isFlowering && !find.floweringStarted ? [{ date: currentDate, action: 'START_FLO', message: 'Starting flowering cycle' }] : [],
-        ];
+        if(name){
+            data.name = name;
+            historyTasks.push({
+                date: currentDate,
+                action: 'EDIT',
+                message: 'Change name'
+            });
+        }
 
-        const data = {
-            ... startFloweringDate ? { startFloweringDate: startFloweringDate } : {},
-            ... variety ? { variety: variety } : {},
-            ... name ? { name: name } : {},
-            ... isFlowering && !find.floweringStarted ? { floweringStarted : true } : { floweringStarted : false },
-        };
+        if(variety){
+            data.variety = variety;
+            historyTasks.push({
+                date: currentDate,
+                action: 'EDIT',
+                message: 'Change variety'
+            });
+        }
+
+        if(startFloweringDate){
+            data.startFloweringDate = startFloweringDate;
+            historyTasks.push({
+                date: currentDate,
+                action: 'EDIT',
+                message: 'Change start flowering date'
+            });
+        }
+
+        if(isFlowering && !find.floweringStarted){
+            data.floweringStarted = true;
+            historyTasks.push({
+                date: currentDate,
+                action: 'START_FLO',
+                message: 'Starting flowering cycle'
+            });
+        }
+
+        if(!isFlowering && find.floweringStarted){
+            data.floweringStarted = false;
+        }
 
         Plant.findOneAndUpdate(
             { _id: id },
