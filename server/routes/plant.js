@@ -120,7 +120,7 @@ export default {
         const id = req.params.id;
         const { startFloweringDate, variety, name } = req.body;
         const currentDate = Moment();
-        const isFlowering = Moment(startFloweringDate).isBefore(currentDate);
+        const isFlowering = startFloweringDate ? Moment(startFloweringDate).isBefore(currentDate) : null;
         const find = await Plant.findById(id);
         let historyTasks = [];
         const data = {};
@@ -143,7 +143,16 @@ export default {
             });
         }
 
-        if(!isFlowering && find.floweringStarted){
+        if(startFloweringDate){
+            data.startFloweringDate = startFloweringDate;
+            historyTasks.push({
+                date: currentDate,
+                action: 'EDIT',
+                message: 'Change start flowering date'
+            });
+        }
+
+        if(!isFlowering && find.floweringStarted && startFloweringDate){
             data.floweringStarted = false;
             await Plant.findOneAndUpdate({ _id: id },{ $set: { history: [] }});
         }
@@ -157,15 +166,6 @@ export default {
                 message: 'Starting flowering cycle'
             });
             await Plant.findOneAndUpdate({ _id: id },{ $set: { history: [] }});
-        }
-
-        else if(startFloweringDate){
-            data.startFloweringDate = startFloweringDate;
-            historyTasks.push({
-                date: currentDate,
-                action: 'EDIT',
-                message: 'Change start flowering date'
-            });
         }
 
         Plant.findOneAndUpdate(
