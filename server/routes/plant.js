@@ -122,7 +122,7 @@ export default {
         const currentDate = Moment();
         const isFlowering = Moment(startFloweringDate).isBefore(currentDate);
         const find = await Plant.findById(id);
-        const historyTasks = [];
+        let historyTasks = [];
         const data = {};
 
         if(name){
@@ -143,7 +143,23 @@ export default {
             });
         }
 
-        if(startFloweringDate){
+        if(!isFlowering && find.floweringStarted){
+            data.floweringStarted = false;
+            await Plant.findOneAndUpdate({ _id: id },{ $set: { history: [] }});
+        }
+
+        if(isFlowering && !find.floweringStarted){
+            data.floweringStarted = true;
+            data.startFloweringDate = startFloweringDate;
+            historyTasks.push({
+                date: currentDate,
+                action: 'START_FLO',
+                message: 'Starting flowering cycle'
+            });
+            await Plant.findOneAndUpdate({ _id: id },{ $set: { history: [] }});
+        }
+
+        else if(startFloweringDate){
             data.startFloweringDate = startFloweringDate;
             historyTasks.push({
                 date: currentDate,
@@ -152,22 +168,12 @@ export default {
             });
         }
 
-        if(isFlowering && !find.floweringStarted){
-            data.floweringStarted = true;
-            historyTasks.push({
-                date: currentDate,
-                action: 'START_FLO',
-                message: 'Starting flowering cycle'
-            });
-        }
-
-        if(!isFlowering && find.floweringStarted){
-            data.floweringStarted = false;
-        }
-
         Plant.findOneAndUpdate(
             { _id: id },
-            { $set: data, $addToSet: { history: { $each: historyTasks }}},
+            {
+                $set: data,
+                $addToSet: { history: { $each: historyTasks }}
+            },
             { returnDocument: 'after' })
             .populate({ path: 'variety', populate: { path: 'breeder' }})
             .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
