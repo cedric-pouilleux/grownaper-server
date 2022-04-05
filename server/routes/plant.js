@@ -127,31 +127,16 @@ export default {
 
         if(name){
             data.name = name;
-            historyTasks.push({
-                date: currentDate,
-                action: 'EDIT',
-                message: 'Change name'
-            });
+            historyTasks.push({ date: currentDate, action: 'EDIT',  message: 'Change name' });
         }
-
         if(variety){
             data.variety = variety;
-            historyTasks.push({
-                date: currentDate,
-                action: 'EDIT',
-                message: 'Change variety'
-            });
+            historyTasks.push({ date: currentDate,  action: 'EDIT', message: 'Change variety' });
         }
-
         if(startFloweringDate){
             data.startFloweringDate = startFloweringDate;
-            historyTasks.push({
-                date: currentDate,
-                action: 'EDIT',
-                message: 'Change start flowering date'
-            });
+            historyTasks.push({ date: currentDate,  action: 'EDIT',  message: 'Change start flowering date' });
         }
-
         if(!isFlowering && find.floweringStarted && startFloweringDate){
             data.floweringStarted = false;
             await Plant.findOneAndUpdate({ _id: id },{ $set: { history: [] }});
@@ -160,11 +145,7 @@ export default {
         if(isFlowering && !find.floweringStarted){
             data.floweringStarted = true;
             data.startFloweringDate = startFloweringDate;
-            historyTasks.push({
-                date: currentDate,
-                action: 'START_FLO',
-                message: 'Starting flowering cycle'
-            });
+            historyTasks.push({ date: currentDate, action: 'START_FLO',  message: 'Starting flowering cycle' });
             await Plant.findOneAndUpdate({ _id: id },{ $set: { history: [] }});
         }
 
@@ -179,19 +160,33 @@ export default {
             .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
     }),
 
+    /**
+     * Start flowering by ID
+     */
     startFlowering: app.put('/start-flowering/:id', (req, res) => {
         const id = req.params.id;
         const currentDate = new Date();
         Plant.findOneAndUpdate(
             { _id: id },
             {
-                $set: {
-                    floweringStarted: true,
-                    startFloweringDate: currentDate
-                },
-                $addToSet: {
-                    history: { date: currentDate, action: 'START_FLO', message: 'Starting flowering cycle' }
-                }},
+                $set: { floweringStarted: true, startFloweringDate: currentDate },
+                $addToSet: { history: { date: currentDate, action: 'START_FLO', message: 'Starting flowering cycle' }}},
+            { returnDocument: 'after' })
+            .populate({ path: 'variety', populate: { path: 'breeder' }})
+            .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
+    }),
+
+    /**
+     * Start curring by ID
+     */
+    startCurring: app.put('/start-curring/:id', (req, res) => {
+        const id = req.params.id;
+        const currentDate = new Date();
+        Plant.findOneAndUpdate(
+            { _id: id },
+            {
+                $set: { startCurringDate: currentDate, },
+                $addToSet: { history: { date: currentDate, action: 'START_CURRING', message: 'Starting curring' }}},
             { returnDocument: 'after' })
             .populate({ path: 'variety', populate: { path: 'breeder' }})
             .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
