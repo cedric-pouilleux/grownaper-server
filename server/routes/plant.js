@@ -73,21 +73,20 @@ export default {
      */
     addNote: app.post('/notes/add/:id', async(req, res) => {
         const id = req.params.id;
-        const date = req.body.date;
         const content = req.body.content;
-        try {
-            await Plant.findByIdAndUpdate(id, {
-                $addToSet: {
-                    notes: {
-                        date,
-                        content
+            Plant.findByIdAndUpdate(
+                { _id: id },
+                {
+                    $addToSet: {
+                        notes: {
+                            createdAt: new Date(),
+                            content: content
+                        }
                     }
-                }
-            });
-            return res.status(201).send('successful added note');
-        } catch(err) {
-            return res.status(422).send(err);
-        }
+                },
+        { returnDocument: 'after' })
+                .populate({ path: 'variety', populate: { path: 'breeder' }})
+                .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
     }),
 
     /**
@@ -117,50 +116,76 @@ export default {
      * Can edit : name, startFloweringDate, variety
      */
     edit: app.put('/edit/:id', async (req, res) => {
-
         const id = req.params.id;
         const { startFloweringDate, variety, name } = req.body;
-
         const currentDate = Moment();
-        const isFlowering = Moment(startFloweringDate).isBefore(currentDate);
-
+        const isFlowering = startFloweringDate ? Moment(startFloweringDate).isBefore(currentDate) : null;
         const find = await Plant.findById(id);
+        let historyTasks = [];
+        const data = {};
 
-        const historyTasks = [
-            ... startFloweringDate ? [{ date: currentDate,  action: 'EDIT',  message: 'Change start flowering date' }] : [],
-            ... variety ? [{ date: currentDate, action: 'EDIT', message: 'Change variety' }] : [],
-            ... name ? [{ date: currentDate, action: 'EDIT', message: 'Change name' }] : [],
-            ... isFlowering && !find.floweringStarted ? [{ date: currentDate, action: 'START_FLO', message: 'Starting flowering cycle' }] : [],
-        ];
+        if(name){
+            data.name = name;
+            historyTasks.push({ date: currentDate, action: 'EDIT',  message: 'Change name' });
+        }
+        if(variety){
+            data.variety = variety;
+            historyTasks.push({ date: currentDate,  action: 'EDIT', message: 'Change variety' });
+        }
+        if(startFloweringDate){
+            data.startFloweringDate = startFloweringDate;
+            historyTasks.push({ date: currentDate,  action: 'EDIT',  message: 'Change start flowering date' });
+        }
+        if(!isFlowering && find.floweringStarted && startFloweringDate){
+            data.floweringStarted = false;
+            await Plant.findOneAndUpdate({ _id: id },{ $set: { history: [] }});
+        }
 
-        const data = {
-            ... startFloweringDate ? { startFloweringDate: startFloweringDate } : {},
-            ... variety ? { variety: variety } : {},
-            ... name ? { name: name } : {},
-            ... isFlowering && !find.floweringStarted ? { floweringStarted : true } : { floweringStarted : false },
-        };
+        if(isFlowering && !find.floweringStarted){
+            data.floweringStarted = true;
+            data.startFloweringDate = startFloweringDate;
+            historyTasks.push({ date: currentDate, action: 'START_FLO',  message: 'Starting flowering cycle' });
+            await Plant.findOneAndUpdate({ _id: id },{ $set: { history: [] }});
+        }
 
         Plant.findOneAndUpdate(
             { _id: id },
-            { $set: data, $addToSet: { history: { $each: historyTasks }}},
+            {
+                $set: data,
+                $addToSet: { history: { $each: historyTasks }}
+            },
             { returnDocument: 'after' })
             .populate({ path: 'variety', populate: { path: 'breeder' }})
             .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
     }),
 
+    /**
+     * Start flowering by ID
+     */
     startFlowering: app.put('/start-flowering/:id', (req, res) => {
         const id = req.params.id;
         const currentDate = new Date();
         Plant.findOneAndUpdate(
             { _id: id },
             {
-                $set: {
-                    floweringStarted: true,
-                    startFloweringDate: currentDate
-                },
-                $addToSet: {
-                    history: { date: currentDate, action: 'START_FLO', message: 'Starting flowering cycle' }
-                }},
+                $set: { floweringStarted: true, startFloweringDate: currentDate },
+                $addToSet: { history: { date: currentDate, action: 'START_FLO', message: 'Starting flowering cycle' }}},
+            { returnDocument: 'after' })
+            .populate({ path: 'variety', populate: { path: 'breeder' }})
+            .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
+    }),
+
+    /**
+     * Start curring by ID
+     */
+    startCurring: app.put('/start-curring/:id', (req, res) => {
+        const id = req.params.id;
+        const currentDate = new Date();
+        Plant.findOneAndUpdate(
+            { _id: id },
+            {
+                $set: { startCurringDate: currentDate, },
+                $addToSet: { history: { date: currentDate, action: 'START_CURRING', message: 'Starting curring' }}},
             { returnDocument: 'after' })
             .populate({ path: 'variety', populate: { path: 'breeder' }})
             .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));

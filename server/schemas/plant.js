@@ -5,8 +5,9 @@ const plantSchema = new Schema({
     createdAt: Date,
     qrcode: String,
     startFloweringDate: Date,
-    floweringStarted: Boolean, //@Todo => this boolean is useless, can refer to the startFloweringDate
+    floweringStarted: Boolean,
     collected: Date,
+    startCurringDate: Date,
     name: {
         type: String,
         required: false
@@ -17,7 +18,7 @@ const plantSchema = new Schema({
         required: true
     },
     notes: [{
-        date: Date,
+        createdAt: Date,
         content: String
     }],
     history: [{
