@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import "../utils/database";
 import { Plant } from '../models';
 import Moment from 'moment';
+import History from '../common/history-type';
 
 const app = express();
 
@@ -25,7 +26,7 @@ export default {
     /**
      * Add new plant
      */
-    postAdd: app.post('/add', async (req, res) => {
+    add: app.post('/add', async (req, res) => {
         const _id = new mongoose.mongo.ObjectId();
         const date = new Date();
         const startFloweringDate = req.body.startFloweringDate;
@@ -42,24 +43,14 @@ export default {
             const plant = await Plant.create(obj);
             await plant.save();
             const isBefore = Moment(startFloweringDate).isBefore(date);
-            const history = [
-                ...isBefore ? [{
-                    date: startFloweringDate,
-                    action: 'START_FLO',
-                    message: 'Starting flowering cycle',
-                }] : [],
-                {
-                    date: date,
-                    action: 'ADD',
-                    message: 'Creation',
-                }
-            ];
+            const history = [History.add('Creation')];
+            if(isBefore){
+                history.push(History.important('Starting flowering cycle'));
+            }
             await Plant.findByIdAndUpdate(_id, {
-                    floweringStarted: isBefore,
-                    $addToSet: {
-                        history: { $each: history }
-                    }
-                },
+                floweringStarted: isBefore,
+                $addToSet: { history: { $each: history } }
+            },
             { returnDocument: 'after'})
                 .populate({ path: 'variety', populate: { path: 'breeder' }})
                 .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
@@ -74,19 +65,23 @@ export default {
     addNote: app.post('/notes/add/:id', async(req, res) => {
         const id = req.params.id;
         const content = req.body.content;
-            Plant.findByIdAndUpdate(
-                { _id: id },
-                {
-                    $addToSet: {
-                        notes: {
-                            createdAt: new Date(),
-                            content: content
-                        }
-                    }
-                },
-        { returnDocument: 'after' })
-                .populate({ path: 'variety', populate: { path: 'breeder' }})
-                .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
+        if(!content) {
+            return res.status(422).send('Require content value');
+        }
+        Plant.findByIdAndUpdate(
+            { _id: id },
+            {
+                $addToSet: {
+                    notes: {
+                        createdAt: new Date(),
+                        content: content
+                    },
+                    history: History.add('Add new note')
+                }
+            },
+    { returnDocument: 'after' })
+            .populate({ path: 'variety', populate: { path: 'breeder' }})
+            .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
     }),
 
     /**
@@ -99,11 +94,7 @@ export default {
                 {
                     collected: new Date(),
                     $addToSet: {
-                        history: {
-                            date: new Date(),
-                            action: 'COLLECT',
-                            message: 'Collect',
-                        }
+                        history: History.important('Collect plant')
                     }
                 },
             { returnDocument: 'after' })
@@ -126,15 +117,15 @@ export default {
 
         if(name){
             data.name = name;
-            historyTasks.push({ date: currentDate, action: 'EDIT',  message: 'Change name' });
+            historyTasks.push(History.edit('Edit plant name'));
         }
         if(variety){
             data.variety = variety;
-            historyTasks.push({ date: currentDate,  action: 'EDIT', message: 'Change variety' });
+            historyTasks.push(History.edit('Edit plant variety'));
         }
         if(startFloweringDate){
             data.startFloweringDate = startFloweringDate;
-            historyTasks.push({ date: currentDate,  action: 'EDIT',  message: 'Change start flowering date' });
+            historyTasks.push(History.edit('Change start flowering date'));
         }
         if(!isFlowering && find.floweringStarted && startFloweringDate){
             data.floweringStarted = false;
@@ -144,7 +135,7 @@ export default {
         if(isFlowering && !find.floweringStarted){
             data.floweringStarted = true;
             data.startFloweringDate = startFloweringDate;
-            historyTasks.push({ date: currentDate, action: 'START_FLO',  message: 'Starting flowering cycle' });
+            historyTasks.push(History.important('Starting flowering cycle'));
             await Plant.findOneAndUpdate({ _id: id },{ $set: { history: [] }});
         }
 
@@ -169,7 +160,7 @@ export default {
             { _id: id },
             {
                 $set: { floweringStarted: true, startFloweringDate: currentDate },
-                $addToSet: { history: { date: currentDate, action: 'START_FLO', message: 'Starting flowering cycle' }}},
+                $addToSet: { history: History.important('Starting flowering cycle')}},
             { returnDocument: 'after' })
             .populate({ path: 'variety', populate: { path: 'breeder' }})
             .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
@@ -185,7 +176,7 @@ export default {
             { _id: id },
             {
                 $set: { startCurringDate: currentDate, },
-                $addToSet: { history: { date: currentDate, action: 'START_CURRING', message: 'Starting curring' }}},
+                $addToSet: { history: History.important('Starting curring')}},
             { returnDocument: 'after' })
             .populate({ path: 'variety', populate: { path: 'breeder' }})
             .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
