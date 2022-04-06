@@ -18,7 +18,7 @@ const plantSchema = new Schema({
         required: true
     },
     notes: [{
-        date: Date,
+        createdAt: Date,
         content: String
     }],
     history: [{

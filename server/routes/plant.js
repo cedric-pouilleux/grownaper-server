@@ -73,21 +73,20 @@ export default {
      */
     addNote: app.post('/notes/add/:id', async(req, res) => {
         const id = req.params.id;
-        const date = req.body.date;
         const content = req.body.content;
-        try {
-            await Plant.findByIdAndUpdate(id, {
-                $addToSet: {
-                    notes: {
-                        date,
-                        content
+            Plant.findByIdAndUpdate(
+                { _id: id },
+                {
+                    $addToSet: {
+                        notes: {
+                            createdAt: new Date(),
+                            content: content
+                        }
                     }
-                }
-            });
-            return res.status(201).send('successful added note');
-        } catch(err) {
-            return res.status(422).send(err);
-        }
+                },
+        { returnDocument: 'after' })
+                .populate({ path: 'variety', populate: { path: 'breeder' }})
+                .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
     }),
 
     /**
