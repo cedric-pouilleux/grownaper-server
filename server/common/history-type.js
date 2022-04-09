@@ -1,12 +1,5 @@
 class History {
-    add(message){
-        return {
-            date: new Date(),
-            action: 'ADD',
-            message: message,
-        };
-    }
-    edit(message){
+    simple(message){
         return {
             date: new Date(),
             action: 'EDIT',

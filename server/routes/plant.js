@@ -30,25 +30,30 @@ export default {
         const _id = new mongoose.mongo.ObjectId();
         const date = new Date();
         const startFloweringDate = req.body.startFloweringDate;
+        const startGrowingDate = req.body.startGrowingDate;
         const obj = {
             _id,
             name: req.body.name,
             createdAt: date,
-            collected: null,
+            collectedDate: null,
             qrcode: 'https://elegant-brahmagupta-4cd12e.netlify.app/plant/' + _id,
             variety: req.body.variety,
-            startFloweringDate
+            startFloweringDate,
+            startGrowingDate
         }
         try {
             const plant = await Plant.create(obj);
             await plant.save();
-            const isBefore = Moment(startFloweringDate).isBefore(date);
-            const history = [History.add('Creation')];
-            if(isBefore){
-                history.push(History.important('Starting flowering cycle'));
+            const isFloweringBefore = Moment(startFloweringDate).isBefore(date);
+            const isGrowingBefore = Moment(startGrowingDate).isBefore(date);
+            const history = [History.simple('Creation')];
+            if(isGrowingBefore){
+                history.push(History.important('Starting growing'));
+            }
+            if(isFloweringBefore){
+                history.push(History.important('Starting flowering'));
             }
             await Plant.findByIdAndUpdate(_id, {
-                floweringStarted: isBefore,
                 $addToSet: { history: { $each: history } }
             },
             { returnDocument: 'after'})
@@ -76,7 +81,7 @@ export default {
                         createdAt: new Date(),
                         content: content
                     },
-                    history: History.add('Add new note')
+                    history: History.simple('Add new note')
                 }
             },
     { returnDocument: 'after' })
@@ -89,10 +94,11 @@ export default {
      */
     cut: app.put('/cut/:id', (req, res) => {
         const id = req.params.id;
+        const currentDate = Date();
         Plant.findOneAndUpdate(
             { _id: id },
                 {
-                    collected: new Date(),
+                    collectedDate: currentDate,
                     $addToSet: {
                         history: History.important('Collect plant')
                     }
@@ -108,7 +114,7 @@ export default {
      */
     edit: app.put('/edit/:id', async (req, res) => {
         const id = req.params.id;
-        const { startFloweringDate, variety, name } = req.body;
+        const { startFloweringDate, startGrowingDate, variety, name } = req.body;
         const currentDate = Moment();
         const isFlowering = startFloweringDate ? Moment(startFloweringDate).isBefore(currentDate) : null;
         const find = await Plant.findById(id);
@@ -117,25 +123,33 @@ export default {
 
         if(name){
             data.name = name;
-            historyTasks.push(History.edit('Edit plant name'));
+            historyTasks.push(History.simple('Edit plant name'));
         }
         if(variety){
             data.variety = variety;
-            historyTasks.push(History.edit('Edit plant variety'));
+            historyTasks.push(History.simple('Edit plant variety'));
         }
         if(startFloweringDate){
             data.startFloweringDate = startFloweringDate;
-            historyTasks.push(History.edit('Change start flowering date'));
+            historyTasks.push(History.simple('Edit flowering date'));
+        }
+        if(startGrowingDate){
+            data.startGrowingDate = startGrowingDate;
+            historyTasks.push(History.simple('Edit growing date'));
         }
         if(!isFlowering && find.floweringStarted && startFloweringDate){
             data.floweringStarted = false;
             await Plant.findOneAndUpdate({ _id: id },{ $set: { history: [] }});
         }
 
+        if(Moment().isAfter(startGrowingDate)){
+            historyTasks.push(History.important('Start growing'));
+        }
+
         if(isFlowering && !find.floweringStarted){
             data.floweringStarted = true;
             data.startFloweringDate = startFloweringDate;
-            historyTasks.push(History.important('Starting flowering cycle'));
+            historyTasks.push(History.important('Start flowering'));
             await Plant.findOneAndUpdate({ _id: id },{ $set: { history: [] }});
         }
 
@@ -159,8 +173,24 @@ export default {
         Plant.findOneAndUpdate(
             { _id: id },
             {
-                $set: { floweringStarted: true, startFloweringDate: currentDate },
+                $set: { startFloweringDate: currentDate },
                 $addToSet: { history: History.important('Starting flowering cycle')}},
+            { returnDocument: 'after' })
+            .populate({ path: 'variety', populate: { path: 'breeder' }})
+            .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
+    }),
+
+    /**
+     * Start growing by ID
+     */
+    startGrowing: app.put('/start-growing/:id', (req, res) => {
+        const id = req.params.id;
+        const currentDate = new Date();
+        Plant.findOneAndUpdate(
+            { _id: id },
+            {
+                $set: { startGrowingDate: currentDate },
+                $addToSet: { history: History.important('Starting growing cycle')}},
             { returnDocument: 'after' })
             .populate({ path: 'variety', populate: { path: 'breeder' }})
             .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
@@ -171,11 +201,15 @@ export default {
      */
     startCurring: app.put('/start-curring/:id', (req, res) => {
         const id = req.params.id;
+        const weight = req.body.weight;
         const currentDate = new Date();
         Plant.findOneAndUpdate(
             { _id: id },
             {
-                $set: { startCurringDate: currentDate, },
+                $set: {
+                    startCurringDate: currentDate,
+                    weight
+                },
                 $addToSet: { history: History.important('Starting curring')}},
             { returnDocument: 'after' })
             .populate({ path: 'variety', populate: { path: 'breeder' }})
