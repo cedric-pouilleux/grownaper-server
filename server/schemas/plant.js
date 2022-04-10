@@ -4,10 +4,15 @@ const { Schema } = mongoose;
 const plantSchema = new Schema({
     createdAt: Date,
     qrcode: String,
+
+    startGrowingDate: Date,
     startFloweringDate: Date,
-    floweringStarted: Boolean,
-    collected: Date,
     startCurringDate: Date,
+
+    floweringStarted: Boolean,
+
+    collectedDate: Date,
+    weight: Number,
     name: {
         type: String,
         required: false

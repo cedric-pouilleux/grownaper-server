@@ -32,11 +32,11 @@ app.use('/variety', varietyRoutes.delete);
 app.use('/variety', varietyRoutes.edit);
 
 app.use('/plants', plantRoutes.getAll);
-app.use('/plant', plantRoutes.postAdd);
-app.use('/plant', plantRoutes.addNote);
+app.use('/plant', plantRoutes.add);
 app.use('/plant', plantRoutes.delete);
 app.use('/plant', plantRoutes.edit);
 app.use('/plant', plantRoutes.cut);
+app.use('/plant', plantRoutes.addNote);
 app.use('/plant', plantRoutes.startFlowering);
 app.use('/plant', plantRoutes.startCurring);
 
