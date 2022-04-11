@@ -173,7 +173,10 @@ export default {
         Plant.findOneAndUpdate(
             { _id: id },
             {
-                $set: { startFloweringDate: currentDate },
+                $set: {
+                    startFloweringDate: currentDate,
+                    startGrowingDate: currentDate,
+                },
                 $addToSet: { history: History.important('Starting flowering cycle')}},
             { returnDocument: 'after' })
             .populate({ path: 'variety', populate: { path: 'breeder' }})
