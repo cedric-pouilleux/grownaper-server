@@ -16,10 +16,7 @@ router.get('/google',
 router.get('/google/callback',
     passportDefault.authenticate(
         'google',
-        { },
-        () => {
-            console.info('google authentification callback');
-        }
+        { }
     ),
     (req, res) => {
         const accessToken = generateAccessToken(req.user.googleId);

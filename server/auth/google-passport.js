@@ -33,8 +33,9 @@ passport.use(
                     photos: profile.photos
                 });
             }
-            return done(null, user);
+            return done(null, user[0]);
         } catch(err) {
+            console.log(err);
             return done(null, null);
         }
     }

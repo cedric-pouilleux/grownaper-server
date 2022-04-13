@@ -4,10 +4,13 @@ import "../utils/database";
 import { Plant } from '../models';
 import Moment from 'moment';
 import History from '../common/history-type';
+import passport from "passport";
+import '../auth/jwt-passport';
 
 const router = express.Router();
 
 router.get('/',
+    passport.authenticate('jwt'),
     (req, res) => {
        Plant.find({})
             .populate({ path: 'variety', populate: { path: 'breeder' }})
