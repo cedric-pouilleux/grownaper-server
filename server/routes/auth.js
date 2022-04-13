@@ -4,8 +4,7 @@ import generateAccessToken from "../auth/token";
 
 const router = express.Router();
 
-router.get(
-    '/google',
+router.get('/google',
     passportDefault.authenticate(
         'google',
         { scope: ['email']},
