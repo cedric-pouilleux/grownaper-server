@@ -10,7 +10,7 @@ function generateAccessToken(id) {
         audience: process.env.AUTH_JWT_AUDIENCE,
         issuer: process.env.AUTH_JWT_ISSUER,
         subject: id.toString()
-    });
+    }); 
 
     return token;
 }

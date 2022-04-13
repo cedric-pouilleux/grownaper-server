@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(passport.initialize({}));
 
-app.use('/plants', passport.authenticate('jwt', {session: false}), plantRoutes);
+app.use('/plants', plantRoutes);
 app.use('/breeders', breederRoutes);
 app.use('/varieties', varietyRoutes);
 app.use('/feeders', feederRoutes);

@@ -4,6 +4,12 @@ import generateAccessToken from "../auth/token";
 
 const router = express.Router();
 
+router.get('/user', passportDefault.authenticate('jwt'), (req, res) => {
+    res.json({
+        user: req.user
+    });
+});
+
 router.get('/google',
     passportDefault.authenticate(
         'google',
