@@ -8,11 +8,13 @@ import plantSchema from "./plant";
 import varietySchema from './variety';
 import feederSchema from './feeders';
 import feederProductSchema from './feedersProducts';
+import userSchema from './user';
 
 export {
     breederSchema,
     plantSchema,
     varietySchema,
     feederSchema,
-    feederProductSchema
+    feederProductSchema,
+    userSchema
 }

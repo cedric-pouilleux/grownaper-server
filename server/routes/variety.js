@@ -4,14 +4,10 @@ import {Breeders, Variety} from '../models';
 import { varietyPayloadBuilder } from "../utils/builders";
 import mongoose from "mongoose";
 
-const app = express();
+const router = express.Router();
 
-export default {
-
-    /**
-     * Get all varieties
-     */
-    getAll : app.get('/', async (req, res) => {
+router.get('/',
+    async (req, res) => {
         Variety.find({})
             .populate('breeder')
             .exec((err, result) => {
@@ -20,12 +16,10 @@ export default {
                 }
                 res.status(200).json(result);
             });
-    }),
+});
 
-    /**
-     * Add new variety
-     */
-    postAdd: app.post('/add', async (req, res) => {
+router.post('/add',
+    async (req, res) => {
         const _id = new mongoose.mongo.ObjectId();
         const params = varietyPayloadBuilder(req.body);
         const breeder = req.body.breeder;
@@ -39,12 +33,10 @@ export default {
             console.log(err);
             return res.status(422).send('Error with server [422]');
         }
-    }),
+});
 
-    /**
-     * Edit variety
-     */
-    edit: app.put('/edit', async (req, res) => {
+router.put('/edit',
+    async (req, res) => {
         const _id = req.body._id;
         const params = varietyPayloadBuilder(req.body);
         const breeder = req.body.breeder;
@@ -60,12 +52,10 @@ export default {
         } catch(err) {
             return res.status(422).send('Error with server [422]');
         }
-    }),
+});
 
-    /**
-     * Remove variety by id
-     */
-    delete: app.delete('/delete/:id', async (req, res) => {
+router.delete('/delete/:id',
+    async (req, res) => {
         const id = req.params.id;
         try {
             const select = await Variety.findById(id);
@@ -77,6 +67,6 @@ export default {
         } catch(err) {
             return res.status(422).send('Error with server [422]');
         }
-    })
+});
 
-};
+export default router;
