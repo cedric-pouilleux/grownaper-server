@@ -10,7 +10,7 @@ import '../auth/jwt-passport';
 const router = express.Router();
 
 router.get('/',
-    passport.authenticate('jwt'),
+    //passport.authenticate('jwt'),
     (req, res) => {
        Plant.find({})
             .populate({ path: 'variety', populate: { path: 'breeder' }})

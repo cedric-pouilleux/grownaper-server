@@ -8,7 +8,8 @@ import {
     varietyRoutes,
     plantRoutes,
     feederRoutes,
-    feederProductRoutes
+    feederProductRoutes,
+    userRoutes
 } from "./routes";
 
 const app = express();
@@ -25,6 +26,7 @@ app.use('/varieties', varietyRoutes);
 app.use('/feeders', feederRoutes);
 app.use('/feeders-products', feederProductRoutes);
 app.use('/auth', authRoutes);
+app.use('/user', userRoutes);
 
 app.listen(process.env.PORT || 3000, function() {
     console.log('server running on port 3000', '');
