@@ -1,8 +1,22 @@
 import express from 'express';
-import passportDefault from '../auth/google-passport';
-import generateAccessToken from "../auth/token";
+import passportDefault from '../auth/google';
+import generateAccessToken from "../auth/jwt-sign";
 
 const router = express.Router();
+
+router.post('/refresh',
+    passportDefault.authenticate(
+        'google',
+        { scope: ['email']},
+        (req, res, next) => {
+            console.info(req);
+            next();
+        }
+    ),
+    (req, res) => {
+        console.log(req.user);
+    }
+);
 
 router.get('/google',
     passportDefault.authenticate(
@@ -14,13 +28,7 @@ router.get('/google',
     ));
 
 router.get('/google/callback',
-    passportDefault.authenticate(
-        'google',
-        { },
-        () => {
-            console.info('google authentification callback');
-        }
-    ),
+    passportDefault.authenticate('google'),
     (req, res) => {
         const accessToken = generateAccessToken(req.user.googleId);
         res.redirect('http://localhost:8080?token='+ accessToken);

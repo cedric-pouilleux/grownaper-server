@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 
 const userSchema = new Schema({
     createdAt: Date,
+    roles: Array,
     googleId: String,
     displayName: String,
     emails: Array,
