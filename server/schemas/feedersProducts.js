@@ -18,6 +18,15 @@ const feederProductSchema = new Schema({
         type: String,
         required: false
     },
+    type: {
+        type: String, // => all | flowering | growing
+    },
+    dosageMin: {
+        type: Number,
+    },
+    dosageMax : {
+        type: Number
+    },
     description: {
         type: String,
         required: false

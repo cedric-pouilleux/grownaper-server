@@ -4,6 +4,20 @@ import generateAccessToken from "../auth/jwt-sign";
 
 const router = express.Router();
 
+router.post('/refresh',
+    passportDefault.authenticate(
+        'google',
+        { scope: ['email']},
+        (req, res, next) => {
+            console.info(req);
+            next();
+        }
+    ),
+    (req, res) => {
+        console.log(req.user);
+    }
+);
+
 router.get('/google',
     passportDefault.authenticate(
         'google',

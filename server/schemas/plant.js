@@ -4,13 +4,10 @@ const { Schema } = mongoose;
 const plantSchema = new Schema({
     createdAt: Date,
     qrcode: String,
-
     startGrowingDate: Date,
     startFloweringDate: Date,
     startCurringDate: Date,
-
     floweringStarted: Boolean,
-
     collectedDate: Date,
     weight: Number,
     name: {
@@ -22,6 +19,10 @@ const plantSchema = new Schema({
         ref: 'Variety',
         required: true
     },
+    products: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'FeederProduct',
+    }],
     notes: [{
         createdAt: Date,
         content: String

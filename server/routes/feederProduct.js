@@ -6,6 +6,28 @@ import mongoose from "mongoose";
 
 const router = express.Router();
 
+function extractParams(req) {
+    const feeder = req.body.feeder;
+    const params = {
+        title: req.body.title,
+        link: req.body.link,
+        description: req.body.description,
+        feeder
+    };
+    if(req.file?.location){
+        params.picture = req.file.location;
+    }
+    if(req.body.type){
+        params.type = req.body.type;
+    }
+    if(req.body.dosageMin){
+        params.dosageMin = req.body.dosageMin;
+    }
+    if(req.body.dosageMax){
+        params.dosageMax = req.body.dosageMax;
+    }
+    return params;
+}
 
 router.get('/',
     async (req, res) => {
@@ -22,27 +44,23 @@ router.get('/',
 router.post('/add',
     Upload.single('picture'),
     async (req, res) => {
-        const feeder = req.body.feeder;
         const _id = new mongoose.mongo.ObjectId();
-        const params = {
-            _id,
-            title: req.body.title,
-            link: req.body.link,
-            description: req.body.description,
-            ...(req.file?.location && { picture: req.file.location }),
-            feeder
-        };
+        const params = extractParams(req)
         try {
-            const feedersProducts = await FeedersProducts.create(params);
+            const feedersProducts = await FeedersProducts.create({
+                _id,
+                ...params
+            });
             await feedersProducts.save();
-            if(feeder){
+            if(params.feeder){
                 await Feeders.findByIdAndUpdate(
-                    feeder,
+                    params.feeder,
                     { $addToSet: { products: _id } }
                 );
             }
             return res.status(201).json(feedersProducts);
         } catch(err) {
+            console.log(err);
             return res.status(422).send(err);
         }
     });
@@ -51,19 +69,12 @@ router.put('/edit/:id',
     Upload.single('picture'),
     async (req, res) => {
         const _id = req.params.id;
-        const feeder = req.body.feeder;
-        const params = {
-            title: req.body.title,
-            link: req.body.link,
-            description: req.body.description,
-            ...(req.file?.location && {picture: req.file.location}),
-            feeder,
-        };
+        const params = extractParams(req);
         try {
-            if(feeder){
+            if(params.feeder){
                 const find = await FeedersProducts.findOne({_id});
                 const old = find.feeder;
-                await Feeders.findByIdAndUpdate(feeder, { $addToSet: { products: _id } });
+                await Feeders.findByIdAndUpdate(params.feeder, { $addToSet: { products: _id } });
                 await Feeders.findByIdAndUpdate(old, { $pull: { products: _id } });
             }
             await FeedersProducts.findOneAndUpdate({ _id }, params);

@@ -13,9 +13,16 @@ router.get('/',
     //passport.authenticate('jwt'),
     (req, res) => {
        Plant.find({})
-            .populate({ path: 'variety', populate: { path: 'breeder' }})
+            .populate({
+                path: 'variety',
+                populate: {
+                    path: 'breeder'
+                }
+            })
+            .populate('products')
             .exec((err, result) => {
                 if (err && !result) {
+                    console.log(err);
                     res.status(404).send(err);
                 }
                 res.status(200).json(result);
@@ -28,10 +35,13 @@ router.post('/add',
         const date = new Date();
         const startFloweringDate = req.body.startFloweringDate;
         const startGrowingDate = req.body.startGrowingDate;
+        const products = req.body.products;
+        console.log(products);
         const obj = {
             _id,
             name: req.body.name,
             createdAt: date,
+            products,
             collectedDate: null,
             qrcode: 'https://elegant-brahmagupta-4cd12e.netlify.app/plant/' + _id,
             variety: req.body.variety,
@@ -57,6 +67,7 @@ router.post('/add',
                 .populate({ path: 'variety', populate: { path: 'breeder' }})
                 .exec((err, doc) => err ? res.status(422).json(err) : res.status(201).json(doc));
         }  catch(err) {
+            console.log(err);
             return res.status(422).send(err);
         }
 });
